@@ -45,4 +45,6 @@ override.tf.json
 
 *.zip
 
+.trunk
+
 frontend/out/*
