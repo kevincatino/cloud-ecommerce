@@ -60,7 +60,7 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
 # Setup db schema
 resource "null_resource" "trigger_migration" {
   provisioner "local-exec" {
-    command = "aws lambda invoke --function-name index /dev/null"
+    command = "aws lambda invoke --function-name --region ${var.region} index /dev/null"
   }
 
   depends_on = [aws_lambda_function.api_action]
