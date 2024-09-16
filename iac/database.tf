@@ -57,11 +57,33 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
   }
 }
 
-# Setup db schema
-resource "null_resource" "trigger_migration" {
-  provisioner "local-exec" {
-    command = "aws lambda invoke --function-name index /dev/null"
-  }
+resource "aws_db_instance" "example" {
+  allocated_storage    = 20
+  engine               = "postgresql"
+  instance_class       = "db.t3.micro"
+  db_name                 = var.db_name
+  username             = var.db_user
+  password             = var.db_pass
+  skip_final_snapshot  = true
 
-  depends_on = [aws_lambda_function.api_action]
+  # Disable Enhanced Monitoring by setting monitoring_interval to 0
+  monitoring_interval = 0
+
+  # Other optional configurations...
+  backup_retention_period = 7
+  multi_az                = false
+  storage_type            = "gp2"
+}
+
+# Setup db schema
+resource "aws_lambda_invocation" "invoke_generate_schema" {
+  function_name = aws_lambda_function.schema_action.function_name
+
+  # Optional: Pass a payload to the Lambda function (in JSON format)
+  input = jsonencode({
+    "action" : "generate_schema"
+  })
+
+  # You can reference this output as needed in your Terraform config
+  depends_on = [aws_lambda_function.schema_action]
 }

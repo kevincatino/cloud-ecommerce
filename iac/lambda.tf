@@ -1,18 +1,51 @@
-data "archive_file" "lambda" {
-  for_each    = fileset("${path.module}/files", "*.js")
+resource "null_resource" "npm_install_schema" {
+  for_each = fileset("${path.module}/lambda/schema", "**/*.js")
+  provisioner "local-exec" {
+    command = "cd lambda/schema/${split("/", each.value)[0]} && npm i"
+  }
+
+  triggers = {
+    always_run = timestamp()
+  }
+}
+
+resource "null_resource" "npm_install_action" {
+  for_each = fileset("${path.module}/lambda/api", "**/*.js")
+  provisioner "local-exec" {
+    command = "cd lambda/api/${split("/", each.value)[0]} && npm i"
+  }
+
+  triggers = {
+    always_run = timestamp()
+  }
+}
+
+data "archive_file" "schema_lambda" {
+  for_each    = fileset("${path.module}/lambda/schema", "**/*.js")
   type        = "zip"
-  source_file = "files/${each.value}"
-  output_path = "files/${split(".", each.value)[0]}.zip"
+  source_dir = "lambda/schema/${split("/", each.value)[0]}"
+  output_path = "lambda/schema/${split("/", each.value)[0]}.zip"
+
+  depends_on = [null_resource.npm_install_schema]
+}
+
+data "archive_file" "api_lambda" {
+  for_each    = fileset("${path.module}/lambda/api", "**/*.js")
+  type        = "zip"
+  source_dir = "lambda/api/${split("/", each.value)[0]}"
+  output_path = "lambda/api/${split("/", each.value)[0]}.zip"
+
+    depends_on = [null_resource.npm_install_action]
+
 }
 
 data "aws_caller_identity" "current" {}
 
-resource "aws_lambda_function" "api_action" {
-  for_each      = fileset("${path.module}/files", "*.zip")
-  function_name = split(".", each.value)[0]
+resource "aws_lambda_function" "schema_action" {
+  function_name = "generate_schema"
   handler       = "index.handler"
   runtime       = "nodejs16.x"
-  filename      = "files/${each.value}"
+  filename      = "lambda/schema/generate_schema.zip"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
 
   environment {
@@ -30,7 +63,33 @@ resource "aws_lambda_function" "api_action" {
     security_group_ids = [aws_security_group.lambda_sg.id]
   }
 
-  depends_on = [aws_rds_cluster.aurora]
+  depends_on = [aws_rds_cluster.aurora, data.archive_file.schema_lambda]
+}
+
+resource "aws_lambda_function" "api_action" {
+  for_each      = fileset("${path.module}/lambda/api", "*.zip")
+  function_name = split(".", each.value)[0]
+  handler       = "index.handler"
+  runtime       = "nodejs16.x"
+  filename      = "lambda/api/${each.value}"
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
+
+  environment {
+    variables = {
+      DB_HOST     = aws_rds_cluster.aurora.endpoint
+      DB_PORT     = "5432"
+      DB_NAME     = var.db_name
+      DB_USER     = var.db_user
+      DB_PASSWORD = var.db_pass
+    }
+  }
+
+  vpc_config {
+    subnet_ids         = module.vpc.private_subnets
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+
+  depends_on = [aws_rds_cluster.aurora, data.archive_file.api_lambda]
 }
 
 resource "aws_security_group" "lambda_sg" {
