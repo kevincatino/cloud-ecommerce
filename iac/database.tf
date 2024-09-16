@@ -57,10 +57,17 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
   }
 }
 
+#TODO ALECA (estoy ahi nomas, averigua por aca kevo. Esto creo que es mejor que el null_resource)
+#resource "aws_lambda_invocation" "trigger_migration" {
+#  function_name = aws_lambda_function.api_action["index"].function_name
+
+#  input = jsonencode({})
+#}
+
 # Setup db schema
 resource "null_resource" "trigger_migration" {
   provisioner "local-exec" {
-    command = "aws lambda invoke --function-name --region ${var.region} index /dev/null"
+    command = "aws lambda invoke --function-name index --region ${var.region} /dev/null"
   }
 
   depends_on = [aws_lambda_function.api_action]
