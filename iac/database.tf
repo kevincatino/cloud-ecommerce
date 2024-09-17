@@ -21,9 +21,20 @@ resource "aws_security_group" "aurora_sg" {
   }
 }
 
+resource "aws_rds_cluster_parameter_group" "aurora_parameter_group" {
+  name   = "rds-pgroup"
+  family = "aurora-postgresql11"
+
+  parameter {
+    name  = "log_connections"
+    value = "1"
+  }
+}
+
 # Aurora PostgreSQL Cluster
 resource "aws_rds_cluster" "aurora" {
   engine               = "aurora-postgresql"
+  engine_mode = "serverless"
   cluster_identifier   = "aurora-cluster"
   master_username      = var.db_user
   master_password      = var.db_pass
@@ -34,18 +45,32 @@ resource "aws_rds_cluster" "aurora" {
   # Subnets for Aurora
   db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
 
+  scaling_configuration {
+    auto_pause               = true
+    min_capacity             = 2
+    max_capacity             = 4
+    seconds_until_auto_pause = 300
+    timeout_action           = "ForceApplyCapacityChange"
+  }
+
+  depends_on = [
+    aws_security_group.aurora_sg,
+    aws_db_subnet_group.aurora_subnet_group,
+    aws_rds_cluster_parameter_group.aurora_parameter_group,
+  ]
+
   tags = {
     Name = "aurora-cluster"
   }
 }
 
-# Aurora DB Instance
-resource "aws_rds_cluster_instance" "aurora_instance" {
-  identifier        = "aurora-instance-1"
-  engine = "postgres"
-  cluster_identifier = aws_rds_cluster.aurora.id
-  instance_class    = "db.serverless"  # For Aurora Serverless v1 (use db.r6g for v2)
-}
+# # Aurora DB Instance
+# resource "aws_rds_cluster_instance" "aurora_instance" {
+#   identifier        = "aurora-instance-1"
+#   engine = "postgres"
+#   cluster_identifier = aws_rds_cluster.aurora.id
+#   instance_class    = "db.serverless"  # For Aurora Serverless v1 (use db.r6g for v2)
+# }
 
 # Subnet Group for Aurora
 resource "aws_db_subnet_group" "aurora_subnet_group" {
@@ -55,24 +80,6 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
   tags = {
     Name = "aurora-subnet-group"
   }
-}
-
-resource "aws_db_instance" "example" {
-  allocated_storage    = 20
-  engine               = "postgresql"
-  instance_class       = "db.t3.micro"
-  db_name                 = var.db_name
-  username             = var.db_user
-  password             = var.db_pass
-  skip_final_snapshot  = true
-
-  # Disable Enhanced Monitoring by setting monitoring_interval to 0
-  monitoring_interval = 0
-
-  # Other optional configurations...
-  backup_retention_period = 7
-  multi_az                = false
-  storage_type            = "gp2"
 }
 
 # Setup db schema

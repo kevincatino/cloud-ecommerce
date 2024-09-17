@@ -1,5 +1,5 @@
 resource "null_resource" "npm_install_schema" {
-  for_each = fileset("${path.module}/lambda/schema", "**/*.js")
+  for_each = fileset("${path.module}/lambda/schema", "*/*.js")
   provisioner "local-exec" {
     command = "cd lambda/schema/${split("/", each.value)[0]} && npm i"
   }
@@ -10,7 +10,7 @@ resource "null_resource" "npm_install_schema" {
 }
 
 resource "null_resource" "npm_install_action" {
-  for_each = fileset("${path.module}/lambda/api", "**/*.js")
+  for_each = fileset("${path.module}/lambda/api", "*/*.js")
   provisioner "local-exec" {
     command = "cd lambda/api/${split("/", each.value)[0]} && npm i"
   }
@@ -21,7 +21,7 @@ resource "null_resource" "npm_install_action" {
 }
 
 data "archive_file" "schema_lambda" {
-  for_each    = fileset("${path.module}/lambda/schema", "**/*.js")
+  for_each    = fileset("${path.module}/lambda/schema", "*/*.js")
   type        = "zip"
   source_dir = "lambda/schema/${split("/", each.value)[0]}"
   output_path = "lambda/schema/${split("/", each.value)[0]}.zip"
@@ -30,7 +30,7 @@ data "archive_file" "schema_lambda" {
 }
 
 data "archive_file" "api_lambda" {
-  for_each    = fileset("${path.module}/lambda/api", "**/*.js")
+  for_each    = fileset("${path.module}/lambda/api", "*/*.js")
   type        = "zip"
   source_dir = "lambda/api/${split("/", each.value)[0]}"
   output_path = "lambda/api/${split("/", each.value)[0]}.zip"
