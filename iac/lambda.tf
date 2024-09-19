@@ -71,6 +71,7 @@ resource "aws_lambda_function" "api_action" {
   function_name = split(".", each.value)[0]
   handler       = "index.handler"
   runtime       = "nodejs16.x"
+  timeout       = 15  # Set to 15 seconds
   filename      = "lambda/api/${each.value}"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
 
