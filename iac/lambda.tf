@@ -45,7 +45,8 @@ resource "aws_lambda_function" "schema_action" {
   function_name = "generate_schema"
   handler       = "index.handler"
   runtime       = "nodejs16.x"
-  filename      = "lambda/schema/generate_schema.zip"
+    filename      = "lambda/schema/generate_schema.zip"
+  # source_code_hash = data.archive_file.schema_lambda[each.key].output_base64sha256
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
 
   environment {
@@ -67,11 +68,13 @@ resource "aws_lambda_function" "schema_action" {
 }
 
 resource "aws_lambda_function" "api_action" {
-  for_each      = fileset("${path.module}/lambda/api", "*.zip")
-  function_name = split(".", each.value)[0]
+  for_each      = data.archive_file.api_lambda
+  function_name = split("/", each.key)[0]
   handler       = "index.handler"
   runtime       = "nodejs16.x"
-  filename      = "lambda/api/${each.value}"
+  filename      = "lambda/api/${split("/", each.key)[0]}.zip"
+  source_code_hash = data.archive_file.api_lambda[each.key].output_base64sha256
+
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
 
   environment {
