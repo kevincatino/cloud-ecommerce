@@ -1,14 +1,59 @@
 import Head from 'next/head'
 import ActionButton from '@components/ItemAction'
+import { useState } from 'react';
 
 export default function Home() {
 
-  const handleAddClick = () => {
-    console.log('Add item clicked');
+  const [addItem, setAddItem] = useState('')
+  const [addResponse, setAddResponse] = useState(null)
+  const [getItems, setGetItems] = useState([]);
+  const [deleteItemId, setDeleteItemId] = useState('');
+  const [deleteResponse, setDeleteResponse] = useState(null);
+
+  const handleAdd = async () => {
+    try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: addItem, 
+        }),
+      });
+      const data = await response.json()
+      setAddResponse(data);
+      console.log('Added item:', data);
+    } catch (error) {
+      console.error('Error adding item:', error)
+    }
+  }
+
+  const handleGet = async () => {
+    try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+      const data = await response.json();
+      setGetItems(data.slice(0, 10));  // Limit to first 10 items for simplicity
+      console.log('Fetched items:', data);
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
   };
 
-  const handleDeleteClick = () => {
-    console.log('Delete item clicked');
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${deleteItemId}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setDeleteResponse({ success: true, id: deleteItemId });
+        console.log('Deleted item with ID:', deleteItemId);
+      } else {
+        throw new Error('Failed to delete item');
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
   };
 
   return (
@@ -25,22 +70,29 @@ export default function Home() {
           buttonText="Add item" 
           buttonColor="blue" 
           hasInput={true} 
-          onButtonClick={handleAddClick} 
+          onButtonClick={handleAdd} 
           placeholder="Enter item to add"
+          inputValue={addItem}
+          setInputValue={setAddItem}
+          addResponse={addResponse}
         />
         <ActionButton 
           buttonText="Get items" 
           buttonColor="green" 
           hasInput={false} 
-          onButtonClick={() => console.log('Get items clicked')}
+          onButtonClick={handleGet}
           isGetButton={true}
+          getResponse={getItems}
         />
         <ActionButton 
           buttonText="Delete items" 
           buttonColor="red" 
           hasInput={true} 
-          onButtonClick={handleDeleteClick}
-          placeholder="Enter item to delete"
+          onButtonClick={handleDelete}
+          placeholder="Enter item ID to delete"
+          inputValue={deleteItemId}
+          setInputValue={setDeleteItemId}
+          deleteResponse={deleteResponse}
         />
       </div>
     </>
