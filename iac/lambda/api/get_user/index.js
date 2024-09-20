@@ -1,8 +1,8 @@
-const { Client } = require('pg');
+//const { Client } = require('pg');
 
 exports.handler = async (event) => {
     
-    const client = new Client({
+    /*const client = new Client({
         host: process.env.DB_HOST,
         port: process.env.DB_PORT,
         user: process.env.DB_USER,
@@ -15,9 +15,13 @@ exports.handler = async (event) => {
     // Assuming the user data is passed in the event body
     const { username, email } = JSON.parse(event.body);
 
+    console.log("Received data:");
+    console.log("Username:", username);
+    console.log("Email:", email);
+
     try {
         const query = `
-            INSERT INTO user (username, role, email, verified)
+            INSERT INTO users (username, role, email, verified)
             VALUES ($1, $2, $3, true)
             RETURNING id;
         `;
@@ -49,5 +53,11 @@ exports.handler = async (event) => {
                 error: error.message,
             }),
         };
-    }
+    }*/
+
+        const response = {
+            statusCode: 200,
+            body: JSON.stringify({ message: "This is a fake user!" }),
+        };
+        return response;
 };
