@@ -1,8 +1,16 @@
 import Head from 'next/head'
-
-import { API_KEY } from "src/constants";
+import ActionButton from '@components/ItemAction'
 
 export default function Home() {
+
+  const handleAddClick = () => {
+    console.log('Add item clicked');
+  };
+
+  const handleDeleteClick = () => {
+    console.log('Delete item clicked');
+  };
+
   return (
     <>
       <Head>
@@ -11,8 +19,29 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className='flex justify-center items-center flex-col flex-1 gap-2'>
-        {API_KEY}
+
+      <div className='flex flex-row w-screen h-screen'>
+        <ActionButton 
+          buttonText="Add item" 
+          buttonColor="blue" 
+          hasInput={true} 
+          onButtonClick={handleAddClick} 
+          placeholder="Enter item to add"
+        />
+        <ActionButton 
+          buttonText="Get items" 
+          buttonColor="green" 
+          hasInput={false} 
+          onButtonClick={() => console.log('Get items clicked')}
+          isGetButton={true}
+        />
+        <ActionButton 
+          buttonText="Delete items" 
+          buttonColor="red" 
+          hasInput={true} 
+          onButtonClick={handleDeleteClick}
+          placeholder="Enter item to delete"
+        />
       </div>
     </>
   )

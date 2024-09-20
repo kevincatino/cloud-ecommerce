@@ -7,9 +7,5 @@ export default function Navbar() {
       Inventory System
       </Link>
       
-      <div className="flex-1 flex justify-center">
-        <SearchBar />
-      </div>
-      
     </header>
   }
