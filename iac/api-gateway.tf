@@ -9,7 +9,7 @@ resource "aws_apigatewayv2_api" "product_api" {
 resource "aws_apigatewayv2_integration" "get_user_integration" {
   api_id             = aws_apigatewayv2_api.product_api.id
   integration_type   = "AWS_PROXY"
-  integration_uri    = aws_lambda_function.api_action["get_user.zip"].invoke_arn
+  integration_uri    = aws_lambda_function.api_action["get_user/index.js"].invoke_arn
   integration_method = "POST"  # HTTP API Gateway uses POST for AWS_PROXY integrations
 }
 
@@ -29,7 +29,7 @@ resource "aws_apigatewayv2_stage" "default" {
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.api_action["get_user.zip"].function_name
+  function_name = aws_lambda_function.api_action["get_user/index.js"].function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.product_api.execution_arn}/*/*"
 }

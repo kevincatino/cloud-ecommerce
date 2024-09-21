@@ -25,11 +25,7 @@ variable "nextjs_export_directory" {
 variable "domain_name" {
   description = "Domain name"
   type        = string
-<<<<<<< HEAD
-  default     = "aabcc.com"
-=======
   default     = "aabcde.com"
->>>>>>> c2125a4dc82e5894ea0b601e736bf07c054b40e6
 }
 
 variable "db_name" {

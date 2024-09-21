@@ -87,9 +87,6 @@ resource "aws_lambda_function" "api_action" {
     security_group_ids = [aws_security_group.lambda_sg.id]
   }
 
-    source_code_hash = data.archive_file.api_lambda["${split(".", each.key)[0]}/index.js"].output_base64sha256  # Create implicit dependency on the archive file
-
-
   depends_on = [aws_rds_cluster.aurora, data.archive_file.api_lambda]
 }
 
