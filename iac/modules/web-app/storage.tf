@@ -20,13 +20,13 @@ resource "aws_s3_bucket_versioning" "logs" {
   }
 }
 
-data "aws_iam_policy_document" "root_policy" {
+data "aws_iam_policy_document" "www_policy" {
   statement {
     sid    = "AllowPublicRead"
     effect = "Allow"
 resources = [
-      "${aws_s3_bucket.root.arn}",
-      "${aws_s3_bucket.root.arn}/*",
+      "${aws_s3_bucket.www.arn}",
+      "${aws_s3_bucket.www.arn}/*",
     ]
 actions = ["S3:GetObject"]
 principals {
@@ -38,12 +38,12 @@ principals {
   depends_on = [aws_s3_bucket_public_access_block.website_allow_access]
 }
 
-data "aws_iam_policy_document" "www_policy" {
+data "aws_iam_policy_document" "root_policy" {
   statement {
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.www.arn}",
-      "${aws_s3_bucket.www.arn}/*",
+      "${aws_s3_bucket.root.arn}",
+      "${aws_s3_bucket.root.arn}/*",
     ]
 actions = ["S3:GetObject"]
 principals {
@@ -107,37 +107,18 @@ resource "aws_s3_bucket_acl" "website" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "website" {
-  bucket = aws_s3_bucket.www.id
+  bucket = aws_s3_bucket.root.id
   cors_rule {
     allowed_headers = ["Authorization", "Content-Length"]
     allowed_methods = ["GET", "POST"]
-    allowed_origins = ["*", "https://www.${var.domain_name}"] // En realidad, seria solo nuestro domain_name
+    allowed_origins = ["*", aws_s3_bucket_website_configuration.root.website_domain] // En realidad, seria solo nuestro domain_name
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "www" {
-  bucket = aws_s3_bucket.www.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "error.html"
-  }
-}
-
 resource "aws_s3_bucket_website_configuration" "root" {
   bucket = aws_s3_bucket.root.id
-  redirect_all_requests_to {
-    host_name = aws_s3_bucket.www.bucket_domain_name
-  }
-}
-
-resource "aws_s3_bucket_website_configuration" "logs" {
-  bucket = aws_s3_bucket.logs.id
 
   index_document {
     suffix = "index.html"
@@ -147,6 +128,17 @@ resource "aws_s3_bucket_website_configuration" "logs" {
     key = "error.html"
   }
 }
+
+resource "aws_s3_bucket_website_configuration" "www" {
+  bucket = aws_s3_bucket.www.id
+  redirect_all_requests_to {
+    host_name = aws_s3_bucket_website_configuration.root.website_endpoint
+  }
+}
+
+# resource "aws_s3_bucket_website_configuration" "logs" {
+#   bucket = aws_s3_bucket.logs.id
+# }
 
 module "template_files" {
   source   = "hashicorp/dir/template"
@@ -155,7 +147,7 @@ module "template_files" {
 
 resource "aws_s3_object" "website_files" {
   for_each     = module.template_files.files
-  bucket       = aws_s3_bucket.www.id
+  bucket       = aws_s3_bucket.root.id
   key          = each.key
   content_type = each.value.content_type
   source       = each.value.source_path

@@ -25,8 +25,6 @@ data "archive_file" "schema_lambda" {
   type        = "zip"
   source_dir = "lambda/schema/${split("/", each.value)[0]}"
   output_path = "lambda/schema/${split("/", each.value)[0]}.zip"
-
-  depends_on = [null_resource.npm_install_schema]
 }
 
 data "archive_file" "api_lambda" {
@@ -34,9 +32,6 @@ data "archive_file" "api_lambda" {
   type        = "zip"
   source_dir = "lambda/api/${split("/", each.value)[0]}"
   output_path = "lambda/api/${split("/", each.value)[0]}.zip"
-
-    depends_on = [null_resource.npm_install_action]
-
 }
 
 data "aws_caller_identity" "current" {}
@@ -91,6 +86,9 @@ resource "aws_lambda_function" "api_action" {
     subnet_ids         = module.vpc.private_subnets
     security_group_ids = [aws_security_group.lambda_sg.id]
   }
+
+    source_code_hash = data.archive_file.api_lambda["${split(".", each.key)[0]}/index.js"].output_base64sha256  # Create implicit dependency on the archive file
+
 
   depends_on = [aws_rds_cluster.aurora, data.archive_file.api_lambda]
 }
