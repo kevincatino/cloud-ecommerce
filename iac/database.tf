@@ -73,16 +73,6 @@ resource "aws_rds_cluster" "aurora" {
 #   instance_class    = "db.serverless"  # For Aurora Serverless v1 (use db.r6g for v2)
 # }
 
-# Subnet Group for Aurora
-resource "aws_db_subnet_group" "aurora_subnet_group" {
-  name       = "aurora-subnet-group"
-  subnet_ids = module.vpc.private_subnets
-
-  tags = {
-    Name = "aurora-subnet-group"
-  }
-}
-
 # Setup db schema
 resource "aws_lambda_invocation" "invoke_generate_schema" {
   function_name = aws_lambda_function.schema_action.function_name

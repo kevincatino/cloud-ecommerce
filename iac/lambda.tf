@@ -55,7 +55,7 @@ resource "aws_lambda_function" "schema_action" {
   }
 
   vpc_config {
-    subnet_ids         = module.vpc.private_subnets
+    subnet_ids         = aws_db_subnet_group.lambda_subnet_group.subnet_ids
     security_group_ids = [aws_security_group.lambda_sg.id]
   }
 
@@ -85,7 +85,7 @@ resource "aws_lambda_function" "api_action" {
   }
 
   vpc_config {
-    subnet_ids         = module.vpc.private_subnets
+    subnet_ids         = aws_db_subnet_group.lambda_subnet_group.subnet_ids
     security_group_ids = [aws_security_group.lambda_sg.id]
   }
 
