@@ -12,11 +12,14 @@ import (
 )
 
 // Helper function to execute shell commands
-func runCommand(name string, args ...string) error {
+func runCommand(dir string, name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	if dir != "" {
+		cmd.Dir = dir
+	}
 	return cmd.Run()
 }
 
@@ -26,17 +29,17 @@ func buildFrontend() error {
 	frontendDir := "./frontend"
 
 	// Run 'npm install'
-	if err := runCommand("npm", "install", "--prefix", frontendDir); err != nil {
+	if err := runCommand(frontendDir,"npm", "install"); err != nil {
 		return fmt.Errorf("failed to install frontend dependencies: %w", err)
 	}
 
 	// Run 'npm run build'
-	if err := runCommand("npm", "run", "build", "--prefix", frontendDir); err != nil {
+	if err := runCommand(frontendDir,"npm", "run", "build"); err != nil {
 		return fmt.Errorf("failed to build frontend: %w", err)
 	}
 
 	// Run 'npm run export'
-	if err := runCommand("npm", "run", "export", "--prefix", frontendDir); err != nil {
+	if err := runCommand(frontendDir,"npm", "run", "export"); err != nil {
 		return fmt.Errorf("failed to export frontend: %w", err)
 	}
 
@@ -136,7 +139,7 @@ func runTerraformCommand(terraformArgs []string) error {
 	}
 
 	// Run the terraform command
-	if err := runCommand("terraform", terraformArgs...); err != nil {
+	if err := runCommand("", "terraform", terraformArgs...); err != nil {
 		return fmt.Errorf("failed to run terraform command: %w", err)
 	}
 

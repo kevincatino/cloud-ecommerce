@@ -18,7 +18,7 @@ exports.handler = async (event) => {
                 id serial PRIMARY KEY,
                 name varchar(256) UNIQUE NOT NULL,
                 price numeric(10,2)  NOT NULL,
-                stock int  NOT NULL,
+                stock int  NOT NULL CHECK (stock > 0),
                 description varchar(1000)  NOT NULL,
                 image_url varchar(256)
             );
@@ -35,9 +35,9 @@ exports.handler = async (event) => {
                 id serial PRIMARY KEY,
                 user_id int  NOT NULL,
                 product_id int  NOT NULL,
-                reservation_date date  NOT NULL,
-                reservation_time time  NOT NULL,
-                status varchar(256)  NOT NULL,
+                quantity int NOT NULL,
+                reservation_date timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                status varchar(256)  NOT NULL DEFAULT 'PENDING',
                 foreign key (user_id) references users(id),
                 foreign key (product_id) references product(id)
             );
