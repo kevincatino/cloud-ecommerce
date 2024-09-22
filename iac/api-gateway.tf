@@ -58,3 +58,22 @@ resource "aws_apigatewayv2_route" "get_all_products_route" {
   route_key = "GET /product"
   target    = "integrations/${aws_apigatewayv2_integration.get_all_products_integration.id}"
 }
+
+################################################################################################
+#                      DELETE /product/{id}
+################################################################################################
+
+# Create the Lambda integration for /product/{id}
+resource "aws_apigatewayv2_integration" "delete_product_integration" {
+  api_id             = aws_apigatewayv2_api.product_api.id
+  integration_type   = "AWS_PROXY"
+  integration_uri    = aws_lambda_function.api_action["deleteProduct/index.js"].invoke_arn
+  integration_method = "POST"
+}
+
+# Create the route for /product/{id} DELETE
+resource "aws_apigatewayv2_route" "delete_product_route" {
+  api_id    = aws_apigatewayv2_api.product_api.id
+  route_key = "DELETE /product/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.delete_product_integration.id}"
+}
