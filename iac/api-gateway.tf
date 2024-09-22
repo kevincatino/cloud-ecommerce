@@ -21,7 +21,7 @@ resource "aws_lambda_permission" "apigw_lambda_product" {
 }
 
 ################################################################################################
-#                      POST /product
+#                      POST /products
 ################################################################################################
 
 # Create the Lambda integration for /product
@@ -35,13 +35,13 @@ resource "aws_apigatewayv2_integration" "add_product_integration" {
 # Create the route for /product POST
 resource "aws_apigatewayv2_route" "add_product_route" {
   api_id    = aws_apigatewayv2_api.product_api.id
-  route_key = "POST /product"
+  route_key = "POST /products"
   target    = "integrations/${aws_apigatewayv2_integration.add_product_integration.id}"
 }
 
 
 ################################################################################################
-#                      GET /product
+#                      GET /products
 ################################################################################################
 
 # Create the Lambda integration for /product
@@ -49,31 +49,69 @@ resource "aws_apigatewayv2_integration" "get_all_products_integration" {
   api_id             = aws_apigatewayv2_api.product_api.id
   integration_type   = "AWS_PROXY"
   integration_uri    = aws_lambda_function.api_action["getAllProducts/index.js"].invoke_arn
-  integration_method = "POST"
+  integration_method = "GET"
 }
 
 # Create the route for /product POST
 resource "aws_apigatewayv2_route" "get_all_products_route" {
   api_id    = aws_apigatewayv2_api.product_api.id
-  route_key = "GET /product"
+  route_key = "GET /products"
   target    = "integrations/${aws_apigatewayv2_integration.get_all_products_integration.id}"
 }
 
 ################################################################################################
-#                      DELETE /product/{id}
+#                      DELETE /products/{id}
 ################################################################################################
 
-# Create the Lambda integration for /product/{id}
+# Create the Lambda integration for /products/{id}
 resource "aws_apigatewayv2_integration" "delete_product_integration" {
   api_id             = aws_apigatewayv2_api.product_api.id
   integration_type   = "AWS_PROXY"
   integration_uri    = aws_lambda_function.api_action["deleteProduct/index.js"].invoke_arn
+  integration_method = "DELETE"
+}
+
+# Create the route for /products/{id} DELETE
+resource "aws_apigatewayv2_route" "delete_product_route" {
+  api_id    = aws_apigatewayv2_api.product_api.id
+  route_key = "DELETE /products/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.delete_product_integration.id}"
+}
+
+################################################################################################
+#                      GET /bookings
+################################################################################################
+
+# Create the Lambda integration for /bookings
+resource "aws_apigatewayv2_integration" "get_all_bookings_integration" {
+  api_id             = aws_apigatewayv2_api.product_api.id
+  integration_type   = "AWS_PROXY"
+  integration_uri    = aws_lambda_function.api_action["getBookings/index.js"].invoke_arn
+  integration_method = "GET"
+}
+
+# Create the route for /bookings GET
+resource "aws_apigatewayv2_route" "get_all_bookings_route" {
+  api_id    = aws_apigatewayv2_api.product_api.id
+  route_key = "GET /bookings"
+  target    = "integrations/${aws_apigatewayv2_integration.get_all_bookings_integration.id}"
+}
+
+################################################################################################
+#                      POST /bookings
+################################################################################################
+
+# Create the Lambda integration for /product
+resource "aws_apigatewayv2_integration" "add_booking_integration" {
+  api_id             = aws_apigatewayv2_api.product_api.id
+  integration_type   = "AWS_PROXY"
+  integration_uri    = aws_lambda_function.api_action["bookProduct/index.js"].invoke_arn
   integration_method = "POST"
 }
 
-# Create the route for /product/{id} DELETE
-resource "aws_apigatewayv2_route" "delete_product_route" {
+# Create the route for /product POST
+resource "aws_apigatewayv2_route" "add_booking_route" {
   api_id    = aws_apigatewayv2_api.product_api.id
-  route_key = "DELETE /product/{id}"
-  target    = "integrations/${aws_apigatewayv2_integration.delete_product_integration.id}"
+  route_key = "POST /products/{id}/bookings"
+  target    = "integrations/${aws_apigatewayv2_integration.add_booking_integration.id}"
 }

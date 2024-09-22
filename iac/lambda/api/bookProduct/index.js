@@ -9,6 +9,15 @@ exports.handler = async (event) => {
         database: process.env.DB_NAME,
     });
 
+    const { id } = event.pathParameters;
+
+    if (!id) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Product ID is required" }),
+        };
+    }
+
     if (!event.body){
         return {
             statusCode: 400,
@@ -17,7 +26,7 @@ exports.handler = async (event) => {
     }
     const body = JSON.parse(event.body);
 
-    const { productId, userId, amount } = body;
+    const { userId, amount } = body;
 
     if (!productName || !productPrice || !productStockAmount || !productDescription){
         return {
@@ -30,7 +39,13 @@ exports.handler = async (event) => {
 
     try {
         const query = `UPDATE product SET stock = stock - $2 WHERE product_id = $1`;
-        const result = await client.query(query, [productId, amount]);
+        const result = await client.query(query, [id, amount]);
+        if (result.rowCount === 0) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ message: "Product not found" }),
+            };
+        }
     } catch(error) {
         await client.end();
         return {

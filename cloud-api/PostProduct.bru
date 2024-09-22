@@ -1,0 +1,20 @@
+meta {
+  name: PostProduct
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url_cloud}}/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "productName": "name",
+    "productPrice": 10,
+    "productStockAmount": 100,
+    "productDescription": "descripction"
+  }
+}

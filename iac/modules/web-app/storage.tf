@@ -110,8 +110,8 @@ resource "aws_s3_bucket_cors_configuration" "website" {
   bucket = aws_s3_bucket.root.id
   cors_rule {
     allowed_headers = ["Authorization", "Content-Length"]
-    allowed_methods = ["GET", "POST"]
-    allowed_origins = ["*", aws_s3_bucket_website_configuration.root.website_domain] // En realidad, seria solo nuestro domain_name
+    allowed_methods = ["GET", "POST", "DELETE", "PUT"]
+    allowed_origins = ["*"] // En realidad, seria solo nuestro domain_name
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }
