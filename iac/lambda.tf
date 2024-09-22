@@ -72,6 +72,8 @@ resource "aws_lambda_function" "api_action" {
 
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
 
+  timeout       = 15  
+
   environment {
     variables = {
       DB_HOST     = aws_rds_cluster.aurora.endpoint
