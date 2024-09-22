@@ -12,7 +12,8 @@ const ActionButton = ({
     setInputValue,
     addResponse,
     getResponse,
-    deleteResponse 
+    deleteResponse,
+    isGetBooking
 }) => {
 
     const handleKeyDown = (event) => {
@@ -61,6 +62,22 @@ const ActionButton = ({
         )}
 
         {getResponse && getResponse.length > 0 && (
+
+            isGetBooking ?
+            getResponse.map(item => (
+
+                <div className="mt-4 p-4 bg-gray-800 text-white border border-gray-600 rounded-lg w-11/12">
+                    <p className="text-lg font-semibold mb-2">Booking {item.id}:</p>
+                
+                            <ul key={item.id}>
+                                <li className="text-sm"> User ID: {item.user_id}</li>
+                                <li className="text-sm"> Product Id: {item.product_id}</li>
+                                <li className="text-sm"> Quantity: {item.quantity}</li>
+                                <li className="text-sm"> Reservation Date: {item.reservation_date}</li>
+                            </ul>
+                </div>
+            ))
+            :
             getResponse.map(item => (
 
                 <div className="mt-4 p-4 bg-gray-800 text-white border border-gray-600 rounded-lg w-11/12">
@@ -72,7 +89,6 @@ const ActionButton = ({
                                 <li className="text-sm"> Stock: {item.stock}</li>
                                 <li className="text-sm"> Description: {item.description}</li>
                             </ul>
-                    
                 </div>
             ))
         )}

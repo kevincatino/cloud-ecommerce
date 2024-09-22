@@ -10,8 +10,15 @@ export default function Home() {
     productStockAmount: "",
     productDescription: "",
   })
+  const [addBooking, setAddBooking] = useState({
+    userId: "", 
+    amount: "",
+    productId: "",
+  })
+  const [addBookingResponse, setAddBookingResponse] = useState(null)
   const [addResponse, setAddResponse] = useState(null)
   const [getItems, setGetItems] = useState([]);
+  const [getItemsBooked, setGetItemsBooked] = useState([]);
   const [deleteItemId, setDeleteItemId] = useState({
     id: ""
   });
@@ -37,11 +44,41 @@ export default function Home() {
     }
   }
 
+  const handleAddBookings = async () => {
+    try {
+      const response = await fetch(`https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/products/${addBooking.productId}/bookings`, {
+        method: 'POST',
+        body: JSON.stringify(addBooking),
+      });
+      const data = await response.json()
+      setAddBookingResponse(data);
+      console.log('Added item:', data);
+      setAddItem({
+        userId: "", 
+        amount: "",
+        productId: "",
+      })
+    } catch (error) {
+      console.error('Error adding item:', error)
+    }
+  }
+
   const handleGet = async () => {
     try {
       const response = await fetch('https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/products');
       const data = await response.json();
       setGetItems(data.products)
+      console.log('Fetched items:', data);
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
+  };
+
+  const handleGetBookings = async () => {
+    try {
+      const response = await fetch('https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/bookings');
+      const data = await response.json();
+      setGetItemsBooked(data.products)
       console.log('Fetched items:', data);
     } catch (error) {
       console.error('Error fetching items:', error);
@@ -104,10 +141,28 @@ export default function Home() {
           setInputValue={setDeleteItemId}
           deleteResponse={deleteResponse}
         />
-        <ActionButton
+
+        <ActionButton 
           buttonText="Book product" 
           buttonColor="#f39c12"
           hasBorderLeft={true}
+          hasBorderRight={true}
+          hasInput={true} 
+          onButtonClick={handleAddBookings} 
+          placeholder="Enter"
+          inputValue={addBooking}
+          setInputValue={setAddBooking}
+          addResponse={addBookingResponse}
+        />
+
+        <ActionButton 
+          buttonText="Get bookings" 
+          buttonColor="#a569bd" 
+          hasInput={false} 
+          onButtonClick={handleGetBookings}
+          hasBorderRight={true}
+          getResponse={getItemsBooked}
+          isGetBooking={true}
         />
       </div>
     </>
