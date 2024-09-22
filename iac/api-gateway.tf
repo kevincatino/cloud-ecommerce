@@ -3,6 +3,11 @@ resource "aws_apigatewayv2_api" "product_api" {
   name          = "product-api"
   protocol_type = "HTTP"
   description   = "HTTP API for managing products"
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["*"]
+    allow_headers = ["*"]
+  }
 }
 
 resource "aws_apigatewayv2_stage" "default" {
