@@ -1,6 +1,8 @@
 resource "aws_security_group" "aurora_sg" {
   vpc_id = module.vpc.vpc_id
 
+  name = "aurora-sg"
+
   ingress {
     description = "Allow Lambda to connect"
     from_port   = 5432
