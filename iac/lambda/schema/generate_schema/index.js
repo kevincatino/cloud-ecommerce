@@ -14,12 +14,45 @@ exports.handler = async (event) => {
     const query = `
         DO $$
         BEGIN
-            IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users') THEN
-                CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(50));
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'orders') THEN
-                CREATE TABLE orders (id SERIAL PRIMARY KEY, user_id INT, amount DECIMAL);
-            END IF;
+            CREATE TABLE IF NOT EXISTS product(
+                id serial PRIMARY KEY,
+                name varchar(256) UNIQUE NOT NULL,
+                price numeric(10,2)  NOT NULL,
+                stock int  NOT NULL,
+                description varchar(1000)  NOT NULL,
+                image_url varchar(256)
+            );
+            
+             CREATE TABLE IF NOT EXISTS  users(
+                id serial PRIMARY KEY,
+                username varchar(256) UNIQUE  NOT NULL,
+                role int  NOT NULL, 
+                email varchar(256)  NOT NULL,
+                verified boolean  NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS  reservation(
+                id serial PRIMARY KEY,
+                user_id int  NOT NULL,
+                product_id int  NOT NULL,
+                reservation_date date  NOT NULL,
+                reservation_time time  NOT NULL,
+                status varchar(256)  NOT NULL,
+                foreign key (user_id) references users(id),
+                foreign key (product_id) references product(id)
+            );
+
+            -- Insert a user into the 'users' table
+            INSERT INTO users (username, role, email, verified)
+            VALUES ('john_doe', 1, 'john.doe@example.com', true)
+            ON CONFLICT (username) DO NOTHING;
+
+            -- Insert two products into the 'product' table
+            INSERT INTO product (name, price, stock, description, image_url)
+            VALUES 
+                ('Product 1', 29.99, 100, 'Description for Product 1', 'http://example.com/product1.jpg'),
+                ('Product 2', 49.99, 50, 'Description for Product 2', 'http://example.com/product2.jpg')
+            ON CONFLICT (name) DO NOTHING;
         END $$;
     `;
 

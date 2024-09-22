@@ -5,19 +5,20 @@ resource "aws_apigatewayv2_api" "product_api" {
   description   = "HTTP API for managing products"
 }
 
-# Create the Lambda integration
-resource "aws_apigatewayv2_integration" "get_user_integration" {
+# Create the Lambda integration for /product
+resource "aws_apigatewayv2_integration" "add_product_integration" {
   api_id             = aws_apigatewayv2_api.product_api.id
   integration_type   = "AWS_PROXY"
-  integration_uri    = aws_lambda_function.api_action["get_user/index.js"].invoke_arn
-  integration_method = "POST"  # HTTP API Gateway uses POST for AWS_PROXY integrations
+  integration_uri    = aws_lambda_function.api_action["addProduct/index.js"].invoke_arn
+  integration_method = "POST"
 }
 
-# Create the route for /user GET
-resource "aws_apigatewayv2_route" "get_user_route" {
+
+# Create the route for /product POST
+resource "aws_apigatewayv2_route" "add_product_route" {
   api_id    = aws_apigatewayv2_api.product_api.id
-  route_key = "GET /user"
-  target    = "integrations/${aws_apigatewayv2_integration.get_user_integration.id}"
+  route_key = "POST /product"
+  target    = "integrations/${aws_apigatewayv2_integration.add_product_integration.id}"
 }
 
 resource "aws_apigatewayv2_stage" "default" {
@@ -26,10 +27,11 @@ resource "aws_apigatewayv2_stage" "default" {
   auto_deploy = true        # Enable automatic deployment for all routes
 }
 
-resource "aws_lambda_permission" "apigw_lambda" {
-  statement_id  = "AllowAPIGatewayInvoke"
+# Grant API Gateway permission to invoke the Lambda function for /product
+resource "aws_lambda_permission" "apigw_lambda_product" {
+  statement_id  = "AllowAPIGatewayInvokeProduct"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.api_action["get_user/index.js"].function_name
+  function_name = aws_lambda_function.api_action["addProduct/index.js"].function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.product_api.execution_arn}/*/*"
 }
