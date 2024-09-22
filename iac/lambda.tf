@@ -54,6 +54,8 @@ resource "aws_lambda_function" "schema_action" {
     }
   }
 
+  timeout       = 15  
+
   vpc_config {
     subnet_ids         = aws_db_subnet_group.lambda_subnet_group.subnet_ids
     security_group_ids = [aws_security_group.lambda_sg.id]
