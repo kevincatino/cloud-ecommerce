@@ -9,7 +9,7 @@ exports.handler = async (event) => {
         database: process.env.DB_NAME,
     });
 
-    const {overwrite} = event.body
+    const overwrite = event?.body?.overwrite
 
     await client.connect();
 

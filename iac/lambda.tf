@@ -54,7 +54,7 @@ resource "aws_lambda_function" "schema_action" {
     }
   }
 
-  timeout       = 15  
+  timeout       = 60  
 
   vpc_config {
     subnet_ids         = aws_db_subnet_group.lambda_subnet_group.subnet_ids
