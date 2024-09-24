@@ -54,7 +54,7 @@ export default function Home() {
       const data = await response.json()
       setAddBookingResponse(data);
       console.log('Added item:', data);
-      setAddItem({
+      setAddBooking({
         userId: "", 
         amount: "",
         productId: "",
