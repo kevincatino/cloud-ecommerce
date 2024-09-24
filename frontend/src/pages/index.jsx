@@ -54,7 +54,7 @@ export default function Home() {
       const data = await response.json()
       setAddBookingResponse(data);
       console.log('Added item:', data);
-      setAddItem({
+      setAddBooking({
         userId: "", 
         amount: "",
         productId: "",
@@ -112,7 +112,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className='flex flex-row w-screen h-screen'>
+      <div className='flex flex-row w-screen'>
         <ActionButton 
           buttonText="Add product" 
           buttonColor="#85c1e9" 
