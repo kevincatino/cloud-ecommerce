@@ -112,7 +112,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className='flex flex-row w-screen h-screen'>
+      <div className='flex flex-row w-screen'>
         <ActionButton 
           buttonText="Add product" 
           buttonColor="#85c1e9" 

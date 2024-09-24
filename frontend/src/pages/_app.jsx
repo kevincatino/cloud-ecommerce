@@ -4,7 +4,7 @@ import Navbar from '@components/Navbar'
 
 export default function App({ Component, pageProps }) {
   return <div className='w-full bg-primary min-h-screen flex flex-col'>
-    <Navbar></Navbar>
+    <Navbar/>
     <main className='w-full flex-1 flex'>
     <Component {...pageProps} />
     </main>
