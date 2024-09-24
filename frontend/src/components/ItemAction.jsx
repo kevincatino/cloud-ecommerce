@@ -66,7 +66,7 @@ const ActionButton = ({
             isGetBooking ?
             getResponse.map(item => (
 
-                <div className="mt-4 p-4 bg-gray-800 text-white border border-gray-600 rounded-lg w-11/12">
+                <div key={item.id} className="mt-4 p-4 bg-gray-800 text-white border border-gray-600 rounded-lg w-11/12">
                     <p className="text-lg font-semibold mb-2">Booking {item.id}:</p>
                 
                             <ul key={item.id}>
@@ -80,7 +80,7 @@ const ActionButton = ({
             :
             getResponse.map(item => (
 
-                <div className="mt-4 p-4 bg-gray-800 text-white border border-gray-600 rounded-lg w-11/12">
+                <div key={item.id} className="mt-4 p-4 bg-gray-800 text-white border border-gray-600 rounded-lg w-11/12">
                     <p className="text-lg font-semibold mb-2">Item {item.id}:</p>
                 
                             <ul key={item.id}>

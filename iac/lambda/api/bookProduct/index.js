@@ -28,7 +28,7 @@ exports.handler = async (event) => {
 
     const { userId, amount } = body;
 
-    if (!productName || !productPrice || !productStockAmount || !productDescription){
+    if (!userId || !amount){
         return {
             statusCode: 400,
             body: JSON.stringify({ message: "Fields productName, productPrice y productStockAmount are mandatory" }),
@@ -38,7 +38,7 @@ exports.handler = async (event) => {
     await client.connect();
 
     try {
-        const query = `UPDATE product SET stock = stock - $2 WHERE product_id = $1`;
+        const query = `UPDATE product SET stock = stock - $2 WHERE id = $1`;
         const result = await client.query(query, [id, amount]);
         if (result.rowCount === 0) {
             return {
@@ -56,7 +56,7 @@ exports.handler = async (event) => {
 
     try{
         const query = `INSERT INTO reservation (user_id,product_id,quantity) VALUES($1,$2,$3)`
-        const values = [userId,productId,amount]
+        const values = [userId,id,amount]
         await client.query(query,values);
         await client.end();
     }catch(error){

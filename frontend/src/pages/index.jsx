@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import ActionButton from '@components/ItemAction'
 import { useState } from 'react';
+import {API_BASE} from 'src/constants'
 
 export default function Home() {
 
@@ -26,7 +27,7 @@ export default function Home() {
 
   const handleAdd = async () => {
     try {
-      const response = await fetch('https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/products', {
+      const response = await fetch(`${API_BASE}/products`, {
         method: 'POST',
         body: JSON.stringify(addItem),
       });
@@ -46,7 +47,7 @@ export default function Home() {
 
   const handleAddBookings = async () => {
     try {
-      const response = await fetch(`https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/products/${addBooking.productId}/bookings`, {
+      const response = await fetch(`${API_BASE}/products/${addBooking.productId}/bookings`, {
         method: 'POST',
         body: JSON.stringify(addBooking),
       });
@@ -65,7 +66,7 @@ export default function Home() {
 
   const handleGet = async () => {
     try {
-      const response = await fetch('https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/products');
+      const response = await fetch(`${API_BASE}/products`);
       const data = await response.json();
       setGetItems(data.products)
       console.log('Fetched items:', data);
@@ -76,7 +77,7 @@ export default function Home() {
 
   const handleGetBookings = async () => {
     try {
-      const response = await fetch('https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/bookings');
+      const response = await fetch(`${API_BASE}/bookings`);
       const data = await response.json();
       setGetItemsBooked(data.products)
       console.log('Fetched items:', data);
@@ -87,7 +88,7 @@ export default function Home() {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://7qtlrfjn2i.execute-api.us-east-1.amazonaws.com/products/${deleteItemId.id}`, {
+      const response = await fetch(`${API_BASE}/products/${deleteItemId.id}`, {
         method: 'DELETE',
       });
       if (response.ok) {

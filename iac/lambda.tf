@@ -21,10 +21,10 @@ resource "null_resource" "npm_install_action" {
 }
 
 data "archive_file" "schema_lambda" {
-  for_each    = fileset("${path.module}/lambda/schema", "*/*.js")
+  # for_each    = fileset("${path.module}/lambda/schema", "*/*.js")
   type        = "zip"
-  source_dir = "lambda/schema/${split("/", each.value)[0]}"
-  output_path = "lambda/schema/${split("/", each.value)[0]}.zip"
+  source_dir = "lambda/schema/generate_schema"
+  output_path = "lambda/schema/generate_schema.zip"
 }
 
 data "archive_file" "api_lambda" {
@@ -41,7 +41,7 @@ resource "aws_lambda_function" "schema_action" {
   handler       = "index.handler"
   runtime       = "nodejs16.x"
     filename      = "lambda/schema/generate_schema.zip"
-  # source_code_hash = data.archive_file.schema_lambda[each.key].output_base64sha256
+  source_code_hash = data.archive_file.schema_lambda.output_base64sha256
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
 
   environment {

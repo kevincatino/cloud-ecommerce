@@ -9,7 +9,20 @@ exports.handler = async (event) => {
         database: process.env.DB_NAME,
     });
 
+    const {overwrite} = event.body
+
     await client.connect();
+
+    if (overwrite) {
+        const query = `
+        DO $$
+        BEGIN
+            DROP TABLE product;
+            DROP TABLE reservation;
+            DROP TABLE users
+        END $$; `
+        await client.query(query);
+    }
 
     const query = `
         DO $$
