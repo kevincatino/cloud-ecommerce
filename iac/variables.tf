@@ -47,6 +47,7 @@ variable "db_pass" {
   default     = "passssssss"
 }
 
+// TODO: usar terraform.tfvars sin pushear al repo para valores sensibles
 
 
 
