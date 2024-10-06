@@ -38,39 +38,6 @@ principals {
   depends_on = [aws_s3_bucket_public_access_block.website_allow_access]
 }
 
-data "aws_iam_policy_document" "root_policy" {
-  statement {
-    effect = "Allow"
-    resources = [
-      "${aws_s3_bucket.root.arn}",
-      "${aws_s3_bucket.root.arn}/*",
-    ]
-actions = ["S3:GetObject"]
-principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-  }
-
-  depends_on = [aws_s3_bucket_public_access_block.website_allow_access]
-}
-
-locals {
-  bucket_ids = {
-    www  = aws_s3_bucket.www.id
-    root = aws_s3_bucket.root.id
-  }
-
-  log_bucket_id = {
-    log = aws_s3_bucket.logs.id
-  }
-
-  bucket_policies = {
-    www  = data.aws_iam_policy_document.www_policy.json
-    root = data.aws_iam_policy_document.root_policy.json
-  }
-}
-
 resource "aws_s3_bucket_ownership_controls" "website" {
   for_each = local.bucket_ids
   bucket   = each.value
@@ -84,7 +51,7 @@ resource "aws_s3_bucket_public_access_block" "website_allow_access" {
   for_each = local.bucket_ids
   bucket   = each.value
 
-  block_public_acls       = false
+  block_public_acls       = false // TODO: bloquear ACL publico
   block_public_policy     = false
   ignore_public_acls      = false
   restrict_public_buckets = false
@@ -102,7 +69,7 @@ resource "aws_s3_bucket_policy" "website" {
 resource "aws_s3_bucket_acl" "website" {
   for_each   = local.bucket_ids
   bucket     = each.value
-  acl        = "public-read"
+  acl        = "public-read" // TODO: Debería ser privado
   depends_on = [aws_s3_bucket_ownership_controls.website, aws_s3_bucket_public_access_block.website_allow_access]
 }
 
@@ -111,7 +78,7 @@ resource "aws_s3_bucket_cors_configuration" "website" {
   cors_rule {
     allowed_headers = ["Authorization", "Content-Length"]
     allowed_methods = ["GET", "POST", "DELETE", "PUT"]
-    allowed_origins = ["*"] // En realidad, seria solo nuestro domain_name
+    allowed_origins = ["*"]
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }
@@ -136,9 +103,9 @@ resource "aws_s3_bucket_website_configuration" "www" {
   }
 }
 
-# resource "aws_s3_bucket_website_configuration" "logs" {
-#   bucket = aws_s3_bucket.logs.id
-# }
+resource "aws_s3_bucket_website_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+}
 
 module "template_files" {
   source   = "hashicorp/dir/template"

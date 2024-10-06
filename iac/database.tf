@@ -67,14 +67,6 @@ resource "aws_rds_cluster" "aurora" {
   }
 }
 
-# # Aurora DB Instance
-# resource "aws_rds_cluster_instance" "aurora_instance" {
-#   identifier        = "aurora-instance-1"
-#   engine = "postgres"
-#   cluster_identifier = aws_rds_cluster.aurora.id
-#   instance_class    = "db.serverless"  # For Aurora Serverless v1 (use db.r6g for v2)
-# }
-
 # Setup db schema
 resource "aws_lambda_invocation" "invoke_generate_schema" {
   function_name = aws_lambda_function.schema_action.function_name

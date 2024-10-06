@@ -20,22 +20,6 @@ resource "null_resource" "npm_install_action" {
   }
 }
 
-data "archive_file" "schema_lambda" {
-  # for_each    = fileset("${path.module}/lambda/schema", "*/*.js")
-  type        = "zip"
-  source_dir = "lambda/schema/generate_schema"
-  output_path = "lambda/schema/generate_schema.zip"
-}
-
-data "archive_file" "api_lambda" {
-  for_each    = fileset("${path.module}/lambda/api", "*/*.js")
-  type        = "zip"
-  source_dir = "lambda/api/${split("/", each.value)[0]}"
-  output_path = "lambda/api/${split("/", each.value)[0]}.zip"
-}
-
-data "aws_caller_identity" "current" {}
-
 resource "aws_lambda_function" "schema_action" {
   function_name = "generate_schema"
   handler       = "index.handler"
@@ -99,11 +83,10 @@ resource "aws_security_group" "lambda_sg" {
   description = "Security group for Lambda functions connecting to Aurora"
   vpc_id      = module.vpc.vpc_id
 
-  # Outbound rules to allow Lambda to connect to Aurora on PostgreSQL (5432) or MySQL (3306)
   egress {
-    from_port   = 5432  # or 3306 if using MySQL
+    from_port   = 5432  
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow outbound traffic to any destination
+    cidr_blocks = ["0.0.0.0/0"]  
   }
 }
