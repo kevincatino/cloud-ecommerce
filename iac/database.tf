@@ -36,17 +36,17 @@ resource "aws_rds_cluster_parameter_group" "aurora_parameter_group" {
 # Aurora PostgreSQL Cluster
 resource "aws_rds_cluster" "aurora" {
   engine               = "aurora-postgresql"
-  engine_mode = "serverless"
+  engine_mode          = "serverless"
   cluster_identifier   = "aurora-cluster"
   master_username      = var.db_user
   master_password      = var.db_pass
   database_name        = var.db_name
-  enable_http_endpoint    = true
+  enable_http_endpoint = true
   skip_final_snapshot  = true
   vpc_security_group_ids = [aws_security_group.aurora_sg.id]
 
   # Subnets for Aurora
-  db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
+  db_subnet_group_name = aws_db_subnet_group.aurora.name
 
   scaling_configuration {
     auto_pause               = true
@@ -58,7 +58,7 @@ resource "aws_rds_cluster" "aurora" {
 
   depends_on = [
     aws_security_group.aurora_sg,
-    aws_db_subnet_group.aurora_subnet_group,
+    aws_db_subnet_group.aurora,
     aws_rds_cluster_parameter_group.aurora_parameter_group,
   ]
 
@@ -71,11 +71,9 @@ resource "aws_rds_cluster" "aurora" {
 resource "aws_lambda_invocation" "invoke_generate_schema" {
   function_name = aws_lambda_function.schema_action.function_name
 
-  # Optional: Pass a payload to the Lambda function (in JSON format)
   input = jsonencode({
     "action" : "generate_schema"
   })
 
-  # You can reference this output as needed in your Terraform config
   depends_on = [aws_lambda_function.schema_action]
 }

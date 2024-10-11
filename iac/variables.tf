@@ -47,6 +47,39 @@ variable "db_pass" {
   default     = "passssssss"
 }
 
+variable "vpc_name" {
+  description = "Name of the VPC"
+  type        = string
+  default     = "cloud-ecommerce-vpc"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+  default     = ["us-east-1a", "us-east-1b"]
+}
+
+variable "private_subnets" {
+  description = "List of private subnet CIDRs"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]
+}
+
+variable "default_tags" {
+  description = "Default tags to apply to all resources"
+  type        = map(string)
+  default = {
+    Project     = "cloud-pickup-ecommerce"
+    Owner       = "kcatino@itba.edu.ar, acaeiro@itba.edu.ar, cditoro@itba.edu.ar, iszejer@itba.edu.ar"
+  }
+}
+
 // TODO: usar terraform.tfvars sin pushear al repo para valores sensibles
 
 

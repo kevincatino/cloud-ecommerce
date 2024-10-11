@@ -1,29 +1,34 @@
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "cloud-ecommerce-vpc"
-  cidr = "10.0.0.0/16"
+  name = var.vpc_name
+  cidr = var.vpc_cidr
 
-  azs             = ["us-east-1a", "us-east-1b"]
-  private_subnets = ["10.0.1.0/24","10.0.2.0/24", "10.0.3.0/24","10.0.4.0/24"]
+  #azs             = slice(data.aws_availability_zones.available.names, 0, 2)
+  azs             = var.availability_zones
+  private_subnets = var.private_subnets
   public_subnets  = []
 
   enable_nat_gateway = false
   enable_vpn_gateway = false
+
+  tags = merge(var.default_tags, {
+    Name = var.vpc_name
+  })
 }
 
 # Subnet Group for Aurora
-resource "aws_db_subnet_group" "aurora_subnet_group" {
-  name       = "aurora-subnet-group"
+resource "aws_db_subnet_group" "aurora" {
+  name       = "aurora_subnet_group"
   subnet_ids = [module.vpc.private_subnets[2], module.vpc.private_subnets[3]]
 
   tags = {
-    Name = "aurora-subnet-group"
+    Name = "aurora_subnet_group"
   }
 }
 
-# Subnet Group for Aurora
-resource "aws_db_subnet_group" "lambda_subnet_group" {
+# Subnet Group for Lambda
+resource "aws_db_subnet_group" "lambda" {
   name       = "lambda_subnet_group"
   subnet_ids = [module.vpc.private_subnets[0], module.vpc.private_subnets[1]]
 

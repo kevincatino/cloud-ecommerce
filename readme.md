@@ -1,7 +1,7 @@
 
 <h1 align="center" href="https://docs.aws.amazon.com/?nc2=h_ql_doc_do&refid=d4b6ebcb-1bab-48ea-bd64-310bd8b10d2a" style="display: block; font-size: 2.5em; font-weight: bold; margin-block-start: 1em; margin-block-end: 1em;">
 <a name="logo"><img align="center" src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS" style="width:50%;height:100%"/></a>
-  <br /><br /><strong><em>PickItUp</em></strong>
+  <br /><br /><strong><em>PickItUp</em> - Cloud Computing Project</strong>
 </h1>
 
 ## Table of contents[![](https://raw.githubusercontent.com/aregtech/areg-sdk/master/docs/img/pin.svg)](#table-of-contents) 
