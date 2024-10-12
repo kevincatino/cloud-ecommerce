@@ -6,13 +6,7 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "app_name" {
-  description = "Name of the web application"
-  type        = string
-  default     = "web-app"
-}
-
-variable "nextjs_export_directory" {
+variable "static_files_dir" {
   description = "Static export directory of Web App"
   type        = string
 }

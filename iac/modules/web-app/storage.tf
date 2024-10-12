@@ -103,13 +103,9 @@ resource "aws_s3_bucket_website_configuration" "www" {
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "logs" {
-  bucket = aws_s3_bucket.logs.id
-}
-
 module "template_files" {
   source   = "hashicorp/dir/template"
-  base_dir = var.nextjs_export_directory
+  base_dir = var.static_files_dir
 }
 
 resource "aws_s3_object" "website_files" {

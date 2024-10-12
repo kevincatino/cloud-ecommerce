@@ -1,0 +1,19 @@
+db_name = "inventory"
+
+db_user =  "username"
+
+db_pass = "password"
+
+nextjs_export_directory = "../frontend/out"
+
+domain_name = "mycustomdomain.com"
+
+region = "us-east-1"
+
+vpc_name = "cloud-ecommerce-vpc"
+
+vpc_cidr = "10.0.0.0/16"
+
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]

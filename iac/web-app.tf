@@ -3,8 +3,7 @@ module "web_app_1" {
 
   # Input Variables
   domain_name             = var.domain_name
-  app_name                = var.app_name
-  nextjs_export_directory = var.nextjs_export_directory
+  static_files_dir = var.nextjs_export_directory
 }
 
 

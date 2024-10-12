@@ -1,24 +1,24 @@
-resource "null_resource" "npm_install_schema" {
-  for_each = fileset("${path.module}/lambda/schema", "*/*.js")
-  provisioner "local-exec" {
-    command = "cd lambda/schema/${split("/", each.value)[0]} && npm i"
-  }
+# resource "null_resource" "npm_install_schema" {
+#   for_each = fileset("${path.module}/lambda/schema", "*/*.js")
+#   provisioner "local-exec" {
+#     command = "cd lambda/schema/${split("/", each.value)[0]} && npm i"
+#   }
 
-  triggers = {
-    always_run = timestamp()
-  }
-}
+#   triggers = {
+#     always_run = timestamp()
+#   }
+# }
 
-resource "null_resource" "npm_install_action" {
-  for_each = fileset("${path.module}/lambda/api", "*/*.js")
-  provisioner "local-exec" {
-    command = "cd lambda/api/${split("/", each.value)[0]} && npm i"
-  }
+# resource "null_resource" "npm_install_action" {
+#   for_each = fileset("${path.module}/lambda/api", "*/*.js")
+#   provisioner "local-exec" {
+#     command = "cd lambda/api/${split("/", each.value)[0]} && npm i"
+#   }
 
-  triggers = {
-    always_run = timestamp()
-  }
-}
+#   triggers = {
+#     always_run = timestamp()
+#   }
+# }
 
 resource "aws_lambda_function" "schema_action" {
   function_name = "generate_schema"
@@ -26,7 +26,7 @@ resource "aws_lambda_function" "schema_action" {
   runtime       = "nodejs16.x"
     filename      = "lambda/schema/generate_schema.zip"
   source_code_hash = data.archive_file.schema_lambda.output_base64sha256
-  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
+  role          = local.lab_role_arn // usamos LabRole porque no podemos crear roles o adjuntar policies
 
   environment {
     variables = {
@@ -50,13 +50,13 @@ resource "aws_lambda_function" "schema_action" {
 
 resource "aws_lambda_function" "api_action" {
   for_each      = data.archive_file.api_lambda
-  function_name = split("/", each.key)[0]
+  function_name = split("_", split("/", each.key)[0])[0]
   handler       = "index.handler"
   runtime       = "nodejs16.x"
   filename      = "lambda/api/${split("/", each.key)[0]}.zip"
   source_code_hash = data.archive_file.api_lambda[each.key].output_base64sha256
 
-  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole" // usamos LabRole porque no podemos crear roles o adjuntar policies
+  role          = local.lab_role_arn // usamos LabRole porque no podemos crear roles o adjuntar policies
 
   timeout       = 15  
 
@@ -76,6 +76,7 @@ resource "aws_lambda_function" "api_action" {
   }
 
   depends_on = [aws_rds_cluster.aurora, data.archive_file.api_lambda]
+
 }
 
 resource "aws_security_group" "lambda_sg" {

@@ -4,18 +4,6 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "app_name" {
-  description = "Name of the web application"
-  type        = string
-  default     = "web-app"
-}
-
-variable "environment_name" {
-  description = "Deployment environment"
-  type        = string
-  default     = "dev"
-}
-
 variable "nextjs_export_directory" {
   description = "Static export directory of NextJS App"
   type        = string
@@ -25,7 +13,6 @@ variable "nextjs_export_directory" {
 variable "domain_name" {
   description = "Domain name"
   type        = string
-  default     = "asdfkljh.com"
 }
 
 variable "db_name" {
@@ -37,14 +24,12 @@ variable "db_name" {
 variable "db_user" {
   description = "Username for DB"
   type        = string
-  default     = "userrrr"
 }
 
 variable "db_pass" {
   description = "Password for DB"
   type        = string
   sensitive   = true
-  default     = "passssssss"
 }
 
 variable "vpc_name" {
@@ -78,10 +63,4 @@ variable "default_tags" {
     Project     = "cloud-pickup-ecommerce"
     Owner       = "kcatino@itba.edu.ar, acaeiro@itba.edu.ar, cditoro@itba.edu.ar, iszejer@itba.edu.ar"
   }
-}
-
-// TODO: usar terraform.tfvars sin pushear al repo para valores sensibles
-
-
-
-
+} // TODO: maybe we could use locals instead of variables for this

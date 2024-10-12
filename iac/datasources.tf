@@ -11,9 +11,9 @@ data "archive_file" "api_lambda" {
   output_path = "lambda/api/${split("/", each.value)[0]}.zip"
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_region" "this" {}
 
-data "aws_region" "current" {}
+data "aws_caller_identity" "this" {}
 
 data "aws_availability_zones" "available" {
   state = "available"
