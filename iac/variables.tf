@@ -60,7 +60,7 @@ variable "default_tags" {
   description = "Default tags to apply to all resources"
   type        = map(string)
   default = {
-    Project     = "cloud-pickup-ecommerce"
-    Owner       = "kcatino@itba.edu.ar, acaeiro@itba.edu.ar, cditoro@itba.edu.ar, iszejer@itba.edu.ar"
+    Project = "cloud-pickup-ecommerce"
+    Owner   = "kcatino@itba.edu.ar, acaeiro@itba.edu.ar, cditoro@itba.edu.ar, iszejer@itba.edu.ar"
   }
 } // TODO: maybe we could use locals instead of variables for this

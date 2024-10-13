@@ -21,12 +21,12 @@
 # }
 
 resource "aws_lambda_function" "schema_action" {
-  function_name = "generate_schema"
-  handler       = "index.handler"
-  runtime       = "nodejs16.x"
-    filename      = "lambda/schema/generate_schema.zip"
+  function_name    = "generate_schema"
+  handler          = "index.handler"
+  runtime          = "nodejs16.x"
+  filename         = "lambda/schema/generate_schema.zip"
   source_code_hash = data.archive_file.schema_lambda.output_base64sha256
-  role          = local.lab_role_arn // usamos LabRole porque no podemos crear roles o adjuntar policies
+  role             = local.lab_role_arn // usamos LabRole porque no podemos crear roles o adjuntar policies
 
   environment {
     variables = {
@@ -38,7 +38,7 @@ resource "aws_lambda_function" "schema_action" {
     }
   }
 
-  timeout       = 60  
+  timeout = 60
 
   vpc_config {
     subnet_ids         = aws_db_subnet_group.lambda.subnet_ids
@@ -49,16 +49,16 @@ resource "aws_lambda_function" "schema_action" {
 }
 
 resource "aws_lambda_function" "api_action" {
-  for_each      = data.archive_file.api_lambda
-  function_name = split("_", split("/", each.key)[0])[0]
-  handler       = "index.handler"
-  runtime       = "nodejs16.x"
-  filename      = "lambda/api/${split("/", each.key)[0]}.zip"
+  for_each         = data.archive_file.api_lambda
+  function_name    = split("_", split("/", each.key)[0])[0]
+  handler          = "index.handler"
+  runtime          = "nodejs16.x"
+  filename         = "lambda/api/${split("/", each.key)[0]}.zip"
   source_code_hash = data.archive_file.api_lambda[each.key].output_base64sha256
 
-  role          = local.lab_role_arn // usamos LabRole porque no podemos crear roles o adjuntar policies
+  role = local.lab_role_arn // usamos LabRole porque no podemos crear roles o adjuntar policies
 
-  timeout       = 15  
+  timeout = 15
 
   environment {
     variables = {
@@ -67,6 +67,7 @@ resource "aws_lambda_function" "api_action" {
       DB_NAME     = var.db_name
       DB_USER     = var.db_user
       DB_PASSWORD = var.db_pass
+      IMAGES_BUCKET = aws_s3_bucket.item_images.id
     }
   }
 
@@ -85,9 +86,9 @@ resource "aws_security_group" "lambda_sg" {
   vpc_id      = module.vpc.vpc_id
 
   egress {
-    from_port   = 5432  
+    from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }

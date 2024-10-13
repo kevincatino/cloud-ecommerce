@@ -1,5 +1,7 @@
 const { Client } = require('pg');
 
+
+
 exports.handler = async (event) => {
     const client = new Client({
         host: process.env.DB_HOST,

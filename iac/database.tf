@@ -4,10 +4,10 @@ resource "aws_security_group" "aurora_sg" {
   name = "aurora-sg"
 
   ingress {
-    description = "Allow Lambda to connect"
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
+    description     = "Allow Lambda to connect"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
     security_groups = [aws_security_group.lambda_sg.id]
   }
 
@@ -35,14 +35,14 @@ resource "aws_rds_cluster_parameter_group" "aurora_parameter_group" {
 
 # Aurora PostgreSQL Cluster
 resource "aws_rds_cluster" "aurora" {
-  engine               = "aurora-postgresql"
-  engine_mode          = "serverless"
-  cluster_identifier   = "aurora-cluster"
-  master_username      = var.db_user
-  master_password      = var.db_pass
-  database_name        = var.db_name
-  enable_http_endpoint = true
-  skip_final_snapshot  = true
+  engine                 = "aurora-postgresql"
+  engine_mode            = "serverless"
+  cluster_identifier     = "aurora-cluster"
+  master_username        = var.db_user
+  master_password        = var.db_pass
+  database_name          = var.db_name
+  enable_http_endpoint   = true
+  skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.aurora_sg.id]
 
   # Subnets for Aurora
