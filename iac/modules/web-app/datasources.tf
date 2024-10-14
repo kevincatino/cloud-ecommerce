@@ -14,3 +14,5 @@ principals {
 
   depends_on = [aws_s3_bucket_public_access_block.website_allow_access]
 }
+
+data "aws_region" "current" {}

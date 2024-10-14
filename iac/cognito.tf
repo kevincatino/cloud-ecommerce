@@ -1,4 +1,4 @@
-resource "aws_cognito_user_pool" "pool" {
+resource "aws_cognito_user_pool" "product_users" {
   name = "cloud-user-pool"
 
   email_verification_subject = "Your Verification Code"
@@ -46,7 +46,7 @@ resource "aws_cognito_user_pool" "pool" {
 }
 
 resource "aws_cognito_identity_provider" "google" {
-  user_pool_id = aws_cognito_user_pool.pool.id
+  user_pool_id = aws_cognito_user_pool.product_users.id
   provider_name = "Google"
 
   provider_details = {
@@ -57,15 +57,15 @@ resource "aws_cognito_identity_provider" "google" {
 
   provider_type = "Google"
   attribute_mapping = {
-    email = "email"
-    name  = "name"
-    sub   = "sub"
+    email     = "email"
+    name      = "name"
+    username  = "sub"
   }
 }
 
-resource "aws_cognito_user_pool_client" "client" {
+resource "aws_cognito_user_pool_client" "product_users" {
   name         = "client"
-  user_pool_id = aws_cognito_user_pool.pool.id
+  user_pool_id = aws_cognito_user_pool.product_users.id
 
   explicit_auth_flows = [
     "ALLOW_USER_PASSWORD_AUTH",
@@ -79,16 +79,16 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_scopes      = ["email", "openid"]
   allowed_oauth_flows_user_pool_client = true
 
-  callback_urls = ["http://localhost:5173"]
+  #callback_urls = [module.web_app_1.bucket_url]
+  callback_urls = ["https://google.com"]
+
 
   supported_identity_providers = ["COGNITO", "Google"]
-
-    depends_on = [aws_cognito_identity_provider.google]
-
+  depends_on = [aws_cognito_identity_provider.google]
 }
 
 
 resource "aws_cognito_user_pool_domain" "user_pool_domain" {
   domain      = "my-user-pool-domain-cloud" 
-  user_pool_id = aws_cognito_user_pool.pool.id
+  user_pool_id = aws_cognito_user_pool.product_users.id
 }
