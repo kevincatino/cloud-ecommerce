@@ -50,8 +50,8 @@ resource "aws_cognito_identity_provider" "google" {
   provider_name = "Google"
 
   provider_details = {
-    client_id     = "1064947204040-03sg6fiu29s0uu7ia4p2nk4ui1kugvc5.apps.googleusercontent.com"
-    client_secret = "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"
+    client_id     = var.google_auth_client_id
+    client_secret = var.google_auth_client_secret
     authorize_scopes = "profile email openid"
   }
 

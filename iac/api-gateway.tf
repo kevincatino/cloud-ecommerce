@@ -13,7 +13,7 @@ resource "aws_apigatewayv2_api" "product_api" {
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.product_api.id
   name        = "$default" 
-  auto_deploy = true       
+  auto_deploy = true
 }
 
 resource "aws_lambda_permission" "apigw_lambda_product" {
@@ -53,6 +53,6 @@ resource "aws_apigatewayv2_route" "lamdba_api_route" {
   api_id    = aws_apigatewayv2_api.product_api.id
   route_key = replace(split("_", split("/", each.key)[0])[1], ".", "/")
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration[split("_", split("/", each.key)[0])[0]].id}"
-  authorization_type = "JWT"               # Specify JWT as the authorization type
+  authorization_type = "JWT"              
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }

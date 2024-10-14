@@ -32,6 +32,18 @@ variable "db_pass" {
   sensitive   = true
 }
 
+variable "google_auth_client_id" {
+  description = "Client id of Google proyect that provides auth"
+  type        = string
+  sensitive   = true
+}
+
+variable "google_auth_client_secret" {
+  description = "Client secret of Google proyect that provides auth"
+  type        = string
+  sensitive   = true
+}
+
 variable "vpc_name" {
   description = "Name of the VPC"
   type        = string
@@ -61,6 +73,6 @@ variable "default_tags" {
   type        = map(string)
   default = {
     Project = "cloud-pickup-ecommerce"
-    Owner   = "kcatino@itba.edu.ar, acaeiro@itba.edu.ar, cditoro@itba.edu.ar, iszejer@itba.edu.ar"
+    Owner   = "kcatino, acaeiro, cditoro, iszejer"
   }
 } // TODO: maybe we could use locals instead of variables for this
