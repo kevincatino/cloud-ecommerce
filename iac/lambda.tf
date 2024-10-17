@@ -1,25 +1,3 @@
-# resource "null_resource" "npm_install_schema" {
-#   for_each = fileset("${path.module}/lambda/schema", "*/*.js")
-#   provisioner "local-exec" {
-#     command = "cd lambda/schema/${split("/", each.value)[0]} && npm i"
-#   }
-
-#   triggers = {
-#     always_run = timestamp()
-#   }
-# }
-
-# resource "null_resource" "npm_install_action" {
-#   for_each = fileset("${path.module}/lambda/api", "*/*.js")
-#   provisioner "local-exec" {
-#     command = "cd lambda/api/${split("/", each.value)[0]} && npm i"
-#   }
-
-#   triggers = {
-#     always_run = timestamp()
-#   }
-# }
-
 resource "aws_lambda_function" "schema_action" {
   function_name    = "generate_schema"
   handler          = "index.handler"

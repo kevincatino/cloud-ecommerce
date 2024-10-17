@@ -71,7 +71,6 @@ resource "aws_rds_cluster" "aurora" {
   }
 }
 
-# Setup db schema
 resource "aws_lambda_invocation" "invoke_generate_schema" {
   function_name = aws_lambda_function.schema_action.function_name
 

@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 )
 
 // Helper function to execute shell commands
@@ -24,22 +23,21 @@ func runCommand(dir string, name string, args ...string) error {
 }
 
 // Function to run npm commands for frontend
-func buildFrontend() error {
+func buildFrontend(frontendDir string) error {
 	fmt.Println("Building frontend...")
-	frontendDir := "./frontend"
 
 	// Run 'npm install'
-	if err := runCommand(frontendDir,"npm", "install"); err != nil {
+	if err := runCommand(frontendDir, "npm", "install"); err != nil {
 		return fmt.Errorf("failed to install frontend dependencies: %w", err)
 	}
 
 	// Run 'npm run build'
-	if err := runCommand(frontendDir,"npm", "run", "build"); err != nil {
+	if err := runCommand(frontendDir, "npm", "run", "build"); err != nil {
 		return fmt.Errorf("failed to build frontend: %w", err)
 	}
 
 	// Run 'npm run export'
-	if err := runCommand(frontendDir,"npm", "run", "export"); err != nil {
+	if err := runCommand(frontendDir, "npm", "run", "export"); err != nil {
 		return fmt.Errorf("failed to export frontend: %w", err)
 	}
 
@@ -96,7 +94,6 @@ func installLambdaDependencies() error {
 	fmt.Println("Installing Lambda dependencies...")
 	lambdasDir := "./iac/lambda/api"
 
-
 	if err := installDependenciesInTopLevelDirs(lambdasDir); err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -121,22 +118,7 @@ func isWindows() bool {
 
 // Function to run Terraform with pre-build tasks
 func runTerraformCommand(terraformArgs []string) error {
-	terraformArgs = append([]string{"-chdir=iac"},terraformArgs...)
-	// Run the npm build commands before terraform plan or apply
-	if strings.Contains(strings.Join(terraformArgs, " "), "apply") || strings.Contains(strings.Join(terraformArgs, " "), "plan") {
-		if err := buildFrontend(); err != nil {
-			return err
-		}
-
-		if err := installLambdaDependencies(); err != nil {
-			return err
-		}
-	}
-
-	// If it's destroy, skip the npm steps
-	if strings.Contains(strings.Join(terraformArgs, " "), "destroy") {
-		fmt.Println("Running terraform destroy...")
-	}
+	terraformArgs = append([]string{"-chdir=iac"}, terraformArgs...)
 
 	// Run the terraform command
 	if err := runCommand("", "terraform", terraformArgs...); err != nil {
@@ -146,16 +128,73 @@ func runTerraformCommand(terraformArgs []string) error {
 	return nil
 }
 
+func outputFrontendEnvs(envFilePath string) {
+	cmd := exec.Command("terraform", "-chdir=iac", "output", "-raw", "api_gateway_url")
+	output, err := cmd.Output()
+	if err != nil {
+		log.Fatalf("Failed to retrieve Terraform output: %v", err)
+	}
+
+	apiGatewayURLKey := "API_BASE"
+	apiGatewayURL := string(output)
+
+	// Define the path for the .env.local file
+
+	// Open or create the .env.local file
+	file, err := os.Create(envFilePath)
+	if err != nil {
+		log.Fatalf("Failed to create .env.local file: %v", err)
+	}
+	defer file.Close()
+
+	// Write the API Gateway URL to the .env.local file
+	envContent := fmt.Sprintf("%s=%s\n", apiGatewayURLKey, apiGatewayURL)
+	_, err = file.WriteString(envContent)
+	if err != nil {
+		log.Fatalf("Failed to write to .env.local file: %v", err)
+	}
+
+	fmt.Println(".env.local file created with API Gateway URL:", apiGatewayURL)
+}
 
 // Main function that acts as the entry point
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatalf("Usage: %s [terraform args]", os.Args[0])
+	if len(os.Args) < 2 || (os.Args[1] != "run" && os.Args[1] != "destroy") {
+		log.Fatalf("Usage: %s [run | destroy]", os.Args[0])
 	}
 
-	terraformArgs := os.Args[1:]
+	arg := os.Args[1:]
 
-	if err := runTerraformCommand(terraformArgs); err != nil {
-		log.Fatalf("Error: %v", err)
+	if arg[0] == "destroy" {
+		if err := runTerraformCommand([]string{"destroy", "-auto-approve"}); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+	} else if arg[0] == "run" {
+		frontendDir := "./frontend"
+		if err := buildFrontend(frontendDir); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
+		if err := installLambdaDependencies(); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
+		if err := runTerraformCommand([]string{"apply", "-auto-approve"}); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
+		envFile := fmt.Sprintf("%s/.env.local", frontendDir)
+
+		outputFrontendEnvs(envFile)
+
+		if err := buildFrontend(frontendDir); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
+		if err := runTerraformCommand([]string{"apply", "-auto-approve"}); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
 	}
+
 }
