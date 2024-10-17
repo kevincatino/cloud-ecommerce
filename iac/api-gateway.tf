@@ -12,8 +12,8 @@ resource "aws_apigatewayv2_api" "product_api" {
 
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.product_api.id
-  name        = "$default" # Using the $default stage
-  auto_deploy = true       # Enable automatic deployment for all routes
+  name        = "$default" 
+  auto_deploy = true
 }
 
 resource "aws_lambda_permission" "apigw_lambda_product" {
@@ -33,9 +33,26 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   integration_method = "POST"
 }
 
+
+resource "aws_apigatewayv2_authorizer" "cognito" {
+  api_id                            = aws_apigatewayv2_api.product_api.id
+  name                              = "CognitoAuthorizer"
+  authorizer_type                   = "JWT"
+
+  # JWT configuration
+  jwt_configuration {
+    audience = [aws_cognito_user_pool_client.product_users.id]
+    issuer   = "https://cognito-idp.${var.region}.amazonaws.com/${aws_cognito_user_pool.product_users.id}" # Issuer URL for the user pool
+  }
+
+  identity_sources = ["$request.header.Authorization"]  # Where to look for the JWT
+}
+
 resource "aws_apigatewayv2_route" "lamdba_api_route" {
   for_each  = data.archive_file.api_lambda
   api_id    = aws_apigatewayv2_api.product_api.id
   route_key = replace(split("_", split("/", each.key)[0])[1], ".", "/")
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration[split("_", split("/", each.key)[0])[0]].id}"
+  authorization_type = "JWT"              
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
