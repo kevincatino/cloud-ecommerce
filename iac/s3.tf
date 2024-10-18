@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "item_images" {
-  bucket = "my-item-images-bucket" # Make sure this bucket name is globally unique
+  bucket = "${var.domain_name}-my-item-images-bucket" # Make sure this bucket name is globally unique
 
   tags = {
     Name        = "Item Images Bucket"
@@ -49,7 +49,7 @@ resource "aws_s3_bucket_public_access_block" "images_bucket_access_block" {
 
 # Create an optional S3 bucket to store logs (optional, used for logging)
 resource "aws_s3_bucket" "logs_bucket" {
-  bucket = "images-logs-bucket"
+  bucket = "${var.domain_name}-images-logs-bucket"
 
 }
 resource "aws_s3_bucket_public_access_block" "logs_bucket_access_block" {
