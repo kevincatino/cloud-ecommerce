@@ -79,7 +79,6 @@ resource "aws_cognito_user_pool_client" "product_users" {
   allowed_oauth_scopes      = ["email", "openid"]
   allowed_oauth_flows_user_pool_client = true
 
-  #callback_urls = [module.web_app_1.bucket_url]
   callback_urls = ["https://ejb1z6m99c.execute-api.us-east-1.amazonaws.com/front"]
 
 
