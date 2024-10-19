@@ -90,8 +90,7 @@ resource "aws_cognito_user_pool_client" "product_users" {
   allowed_oauth_scopes      = ["email", "openid"]
   allowed_oauth_flows_user_pool_client = true
 
-  callback_urls = ["https://ejb1z6m99c.execute-api.us-east-1.amazonaws.com/front"]
-
+  callback_urls = ["${aws_apigatewayv2_api.product_api.api_endpoint}/front"]
 
   supported_identity_providers = ["COGNITO", "Google"]
   depends_on = [aws_cognito_identity_provider.google]
@@ -99,7 +98,7 @@ resource "aws_cognito_user_pool_client" "product_users" {
 
 
 resource "aws_cognito_user_pool_domain" "user_pool_domain" {
-  domain      = "my-user-pool-domain-cloud" 
+  domain      = "${var.domain_name}-my-user-pool-domain-cloud" 
   user_pool_id = aws_cognito_user_pool.product_users.id
 }
 

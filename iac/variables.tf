@@ -33,13 +33,13 @@ variable "db_pass" {
 }
 
 variable "google_auth_client_id" {
-  description = "Client id of Google proyect that provides auth"
+  description = "Client id of Google project that provides auth"
   type        = string
   sensitive   = true
 }
 
 variable "google_auth_client_secret" {
-  description = "Client secret of Google proyect that provides auth"
+  description = "Client secret of Google project that provides auth"
   type        = string
   sensitive   = true
 }

@@ -128,33 +128,44 @@ func runTerraformCommand(terraformArgs []string) error {
 	return nil
 }
 
-func outputFrontendEnvs(envFilePath string) {
-	cmd := exec.Command("terraform", "-chdir=iac", "output", "-raw", "api_gateway_url")
+func getTerraformOutputValue(key string) string {
+	cmd := exec.Command("terraform", "-chdir=iac", "output", "-raw", key)
 	output, err := cmd.Output()
 	if err != nil {
 		log.Fatalf("Failed to retrieve Terraform output: %v", err)
 	}
+	return string(output)
+}
 
-	apiGatewayURLKey := "API_BASE"
-	apiGatewayURL := string(output)
-
-	// Define the path for the .env.local file
-
-	// Open or create the .env.local file
+func writeEnvFile(envFilePath string, envs map[string]string) {
 	file, err := os.Create(envFilePath)
 	if err != nil {
-		log.Fatalf("Failed to create .env.local file: %v", err)
+		log.Fatalf("Failed to create %s file: %v", envFilePath, err)
 	}
 	defer file.Close()
 
-	// Write the API Gateway URL to the .env.local file
-	envContent := fmt.Sprintf("%s=%s\n", apiGatewayURLKey, apiGatewayURL)
-	_, err = file.WriteString(envContent)
-	if err != nil {
-		log.Fatalf("Failed to write to .env.local file: %v", err)
+	envContent := ""
+	for key, value := range envs {
+		envContent = envContent + fmt.Sprintf("%s=%s\n", key, value)
 	}
 
-	fmt.Println(".env.local file created with API Gateway URL:", apiGatewayURL)
+	_, err = file.WriteString(envContent)
+	if err != nil {
+		log.Fatalf("Failed to write to %s file: %v", envFilePath, err)
+	}
+
+	fmt.Printf("%s file created\n", envFilePath)
+
+}
+
+func outputFrontendEnvs(envFilePath string) {
+	envs := make(map[string]string)
+
+	envs["API_BASE"] = getTerraformOutputValue("api_gateway_url")
+	envs["LOGIN_URL"] = getTerraformOutputValue("cognito_hosted_ui_url")
+
+	writeEnvFile(envFilePath, envs)
+
 }
 
 // Main function that acts as the entry point
@@ -194,6 +205,10 @@ func main() {
 		if err := runTerraformCommand([]string{"apply", "-auto-approve"}); err != nil {
 			log.Fatalf("Error: %v", err)
 		}
+
+		websiteUrl := getTerraformOutputValue("website_url")
+
+		fmt.Printf("Architecture deplpoyed! \nWebsite URL: %s\n", websiteUrl)
 
 	}
 

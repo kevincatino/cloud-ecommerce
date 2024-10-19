@@ -6,7 +6,7 @@ db_pass = "password"
 
 nextjs_export_directory = "../frontend/out"
 
-domain_name = "mycustomdomain.com"
+domain_name = "mycustomdomain"
 
 region = "us-east-1"
 

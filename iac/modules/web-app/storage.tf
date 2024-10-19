@@ -1,15 +1,15 @@
 resource "aws_s3_bucket" "www" {
-  bucket        = "www.${var.domain_name}"
+  bucket        = "www.${var.domain_name}.com"
   force_destroy = true
 }
 
 resource "aws_s3_bucket" "root" {
-  bucket        = var.domain_name
+  bucket        = "${var.domain_name}.com"
   force_destroy = true
 }
 
 resource "aws_s3_bucket" "logs" {
-  bucket        = "logs.${var.domain_name}"
+  bucket        = "logs.${var.domain_name}.com"
   force_destroy = true
 }
 
