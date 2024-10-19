@@ -1,6 +1,7 @@
 const { Client } = require('pg');
 const AWS = require('aws-sdk');
 const S3 = new AWS.S3();
+const multipart = require('lambda-multipart-parser');
 
 
 exports.handler = async (event) => {
@@ -22,16 +23,28 @@ exports.handler = async (event) => {
         };
     }
 
+    const result = await multipart.parse(event, true)
+
+    const imageEntry = result.files.find(f => f.fieldname === "image")
+
+    if (!imageEntry) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({message: 'File not found in request' })
+        };
+    }
+
     const bucketName = process.env.IMAGES_BUCKET;
 
     // Parse the content-type header to determine the file type
-    const contentType = event.headers['Content-Type'] || event.headers['content-type'];
+    const contentType = imageEntry['contentType']
 
     // Validate the content type (allow only image types)
     if (!['image/png', 'image/jpeg', 'image/gif'].includes(contentType)) {
         return {
+            event,
             statusCode: 400,
-            body: JSON.stringify({ message: 'Unsupported file type. Only PNG, JPEG, and GIF are allowed.' })
+            body: JSON.stringify({message: 'Unsupported file type. Only PNG, JPEG, and GIF are allowed.' })
         };
     }
 
@@ -43,9 +56,8 @@ exports.handler = async (event) => {
     const s3Params = {
         Bucket: bucketName,
         Key: randomFilename,  // Use the generated random filename
-        Body: Buffer.from(event.body, 'base64'),  // Assuming the image content is base64 encoded in the request
+        Body: imageEntry.content,  // Assuming the image content is base64 encoded in the request
         ContentType: contentType,  // Dynamically set the content type
-        ACL: 'public-read'  // Optional: Make the image publicly accessible
     };
 
     try {
@@ -71,7 +83,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({
                 message: 'Image uploaded successfully',
-                imageUrl: s3Url  // Return the URL of the uploaded image
+                imageUrl: s3Url
             })
         };
 

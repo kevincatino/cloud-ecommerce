@@ -44,7 +44,7 @@ resource "aws_s3_bucket_public_access_block" "images_bucket_access_block" {
   block_public_acls   = true
   block_public_policy = false
   ignore_public_acls  = true
-  restrict_public_buckets = true
+  restrict_public_buckets = false
 }
 
 # Create an optional S3 bucket to store logs (optional, used for logging)
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:RequestTag/Role"
-      values   = ["*"]  # TODO Change when the cognito identity pool role has ben defined
+      values   = [local.lab_role_arn]
     }
   }
 }
@@ -95,4 +95,12 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.item_images.id
   policy = data.aws_iam_policy_document.bucket_policy.json
   depends_on = [ aws_s3_bucket_public_access_block.images_bucket_access_block ]
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = "com.amazonaws.${local.region}.s3"
+  vpc_endpoint_type = "Gateway"
+  
+  route_table_ids = module.vpc.private_route_table_ids
 }

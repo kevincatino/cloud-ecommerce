@@ -209,7 +209,7 @@ func main() {
 
 		websiteUrl := getTerraformOutputValue("website_url")
 
-		fmt.Printf("Architecture deplpoyed! \nWebsite URL: %s\n", websiteUrl)
+		fmt.Printf("Architecture deployed! \nWebsite URL: %s\n", websiteUrl)
 
 	}
 
