@@ -1,9 +1,72 @@
 import Head from 'next/head'
 import ActionButton from '@components/ItemAction'
-import { useState } from 'react';
-import {API_BASE} from 'src/constants'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import {API_BASE, REDIRECT_URI, LOGIN_CLIENT_ID, AUTH_URL} from 'src/constants'
+import qs from 'qs'
+import axios from 'axios';
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Set a timeout to trigger after 5 seconds
+    const timer = setInterval(() => {
+        // Your logic here
+        console.log(router.query);
+    }, 5000); // 5000 milliseconds = 5 seconds
+
+    // Cleanup function to clear the timer if the component unmounts before the timeout
+    return () => clearTimeout(timer);
+}); // Empty dependency array ensures this runs once on mount
+
+  useEffect(() => {
+    // Function to fetch the JWT token using the code from query parameters
+    const fetchToken = async (code) => {
+      console.log(AUTH_URL)
+      console.log(process.env)
+        try {
+          const response = await axios.post(`${AUTH_URL}`, qs.stringify({
+            code,
+            client_id: LOGIN_CLIENT_ID,
+            redirect_uri: REDIRECT_URI,
+            grant_type: 'authorization_code'
+        }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+        })
+            return response.data.id_token;
+        } catch (error) {
+            console.error('Error fetching token:', error.response?.data || error.message);
+            return null;
+        }
+    };
+
+    // Extract the code from query parameters
+    const { code } = router.query; // Assuming the code is in the query parameters
+
+    if (code) {
+        // Fetch the JWT token using the code
+        fetchToken(code).then((fetchedToken) => {
+            if (fetchedToken) {
+                // Persist the token for future requests
+                localStorage.setItem('jwtToken', fetchedToken);
+                setToken(fetchedToken);
+                setIsLoggedIn(true); // Update login state
+            }
+        });
+    } else {
+        // Check if the token is already stored
+        const storedToken = localStorage.getItem('jwtToken');
+        if (storedToken) {
+            setToken(storedToken);
+            setIsLoggedIn(true); // User is logged in if token exists
+        }
+    }
+}, [router.isReady, router.query]);
 
   const [addItem, setAddItem] = useState({
     productName: "", 

@@ -46,6 +46,7 @@ resource "aws_lambda_function" "api_action" {
       DB_USER     = var.db_user
       DB_PASSWORD = var.db_pass
       IMAGES_BUCKET = aws_s3_bucket.item_images.id
+      WEBSITE_URL = module.web_app_1.website_url
     }
   }
 

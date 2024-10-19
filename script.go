@@ -164,6 +164,8 @@ func outputFrontendEnvs(envFilePath string) {
 	envs["API_BASE"] = getTerraformOutputValue("api_gateway_url")
 	envs["LOGIN_URL"] = getTerraformOutputValue("cognito_hosted_ui_url")
 	envs["LOGIN_CLIENT_ID"] = getTerraformOutputValue("login_client_id")
+	envs["REDIRECT_URI"] = getTerraformOutputValue("website_url")
+	envs["AUTH_URL"] = getTerraformOutputValue("cognito_auth_url")
 
 	writeEnvFile(envFilePath, envs)
 

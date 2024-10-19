@@ -3,7 +3,7 @@ exports.handler = async (event) => {
 
     const queryParams = new URLSearchParams(queryStringParameters).toString();
 
-    const baseUrl = 'http://mycustomdomain.com.s3-website-us-east-1.amazonaws.com/';
+    const baseUrl = process.env.WEBSITE_URL;
 
     const redirectUrl = queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
 

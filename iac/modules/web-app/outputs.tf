@@ -8,7 +8,7 @@ output "root_bucket_id" {
   description = "ID of root bucket"
 }
 
-output "bucket_url" {
+output "website_url" {
   value = "http://${aws_s3_bucket.root.bucket}.s3-website-${data.aws_region.current.name}.amazonaws.com"
   description = "The URL of the S3 bucket"
 }

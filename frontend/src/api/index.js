@@ -1,5 +1,24 @@
 import axios from "axios";
-import { API_KEY } from "src/constants";
+import { API_BASE } from "src/constants";
+
+
+const axiosInstance = axios.create({
+  baseURL: API_BASE, // Set your backend API base URL here
+});
+
+// Interceptor to add the JWT token to all requests
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+
+  if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`; // Set the Bearer token
+  }
+
+  return config; // Return the updated config
+}, (error) => {
+  return Promise.reject(error); // Handle the error
+});
+
 
 class ApiClient {
   constructor(baseUrl) {
@@ -8,7 +27,7 @@ class ApiClient {
 
   async request(method, path, body) {
     try {
-      const response = await axios({
+      const response = await axiosInstance({
         method,
         url: `${this.baseUrl}${path}`,
         headers: {

@@ -8,6 +8,10 @@ output "cognito_hosted_ui_url" {
   sensitive = true
 }
 
+output "cognito_auth_url" {
+  value = "https://${aws_cognito_user_pool_domain.user_pool_domain.domain}.auth.${local.region}.amazoncognito.com/oauth2/token"
+}
+
 output "login_client_id" {
      value = "${aws_cognito_user_pool_client.product_users.id}" 
 }
