@@ -12,17 +12,6 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // Set a timeout to trigger after 5 seconds
-    const timer = setInterval(() => {
-        // Your logic here
-        console.log(router.query);
-    }, 5000); // 5000 milliseconds = 5 seconds
-
-    // Cleanup function to clear the timer if the component unmounts before the timeout
-    return () => clearTimeout(timer);
-}); // Empty dependency array ensures this runs once on mount
-
-  useEffect(() => {
     // Function to fetch the JWT token using the code from query parameters
     const fetchToken = async (code) => {
       console.log(AUTH_URL)
