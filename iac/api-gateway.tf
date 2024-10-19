@@ -53,7 +53,23 @@ resource "aws_apigatewayv2_route" "lamdba_api_route" {
   api_id    = aws_apigatewayv2_api.product_api.id
   route_key = replace(split("_", split("/", each.key)[0])[1], ".", "/")
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration[split("_", split("/", each.key)[0])[0]].id}"
-  authorization_type = "JWT"              
-  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
-  authorization_scopes = ["product-admins"] 
+   authorization_type = local.lambda_permission_map[split("_", each.key)[0]].requires_auth ? "JWT" : null
+  authorizer_id      = local.lambda_permission_map[split("_", each.key)[0]].requires_auth ? aws_apigatewayv2_authorizer.cognito.id : null
+  authorization_scopes = local.lambda_permission_map[split("_", each.key)[0]].requires_admin ? ["product-admins"] : []
+}
+
+output "lambda_function_keys" {
+  value = { for key, _ in data.archive_file.api_lambda : key => local.lambda_permission_map[split("_", key)[0]]}
+}
+
+locals {
+  lambda_permission_map = {
+    "addProduct"                      = { requires_admin = true, requires_auth = true }
+    "addProductImage"                 = { requires_admin = true, requires_auth = true }
+    "bookProduct"                     = { requires_admin = false, requires_auth = true }
+    "deleteProduct"                   = { requires_admin = true, requires_auth = true }
+    "getAllProducts"                  = { requires_admin = false, requires_auth = true }
+    "getBookings"                     = { requires_admin = true, requires_auth = true }
+    "redirectLambda"                  = { requires_admin = false, requires_auth = false } 
+    }
 }
