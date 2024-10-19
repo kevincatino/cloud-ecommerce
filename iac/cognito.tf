@@ -43,6 +43,17 @@ resource "aws_cognito_user_pool" "product_users" {
       max_length = 256
     }
   }
+
+  lambda_config {
+    pre_token_generation = aws_lambda_function.preauth_token.arn
+  }
+}
+
+resource "aws_cognito_user_group" "admins" {
+  user_pool_id = aws_cognito_user_pool.product_users.id
+  name         = "product-admins"
+  description  = "Group for admin users"
+  precedence   = 1  # Admins will have higher precedence
 }
 
 resource "aws_cognito_identity_provider" "google" {
@@ -90,4 +101,12 @@ resource "aws_cognito_user_pool_client" "product_users" {
 resource "aws_cognito_user_pool_domain" "user_pool_domain" {
   domain      = "my-user-pool-domain-cloud" 
   user_pool_id = aws_cognito_user_pool.product_users.id
+}
+
+resource "aws_lambda_permission" "allow_cognito_invoke" {
+  statement_id  = "AllowCognitoInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.preauth_token.function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.product_users.arn
 }

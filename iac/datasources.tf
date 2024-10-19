@@ -4,6 +4,12 @@ data "archive_file" "schema_lambda" {
   output_path = "lambda/schema/generate_schema.zip"
 }
 
+data "archive_file" "auth_lambda" {
+  type        = "zip"
+  source_dir  = "lambda/auth/preauth_token"
+  output_path = "lambda/auth/preauth_token.zip"
+}
+
 data "archive_file" "api_lambda" {
   for_each    = fileset("${path.module}/lambda/api", "*/*.js")
   type        = "zip"

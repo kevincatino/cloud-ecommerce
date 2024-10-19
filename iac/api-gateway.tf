@@ -55,4 +55,5 @@ resource "aws_apigatewayv2_route" "lamdba_api_route" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration[split("_", split("/", each.key)[0])[0]].id}"
   authorization_type = "JWT"              
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+  authorization_scopes = ["product-admins"] 
 }

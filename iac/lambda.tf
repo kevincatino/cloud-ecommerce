@@ -58,6 +58,17 @@ resource "aws_lambda_function" "api_action" {
 
 }
 
+# Lambda Function for Pre-Token Generation Trigger
+resource "aws_lambda_function" "preauth_token" {
+  function_name = "preauth_token"
+  filename      = "lambda/auth/preauth_token.zip"  
+  handler       = "index.handler"           
+  runtime       = "nodejs16.x"              
+  role             = local.lab_role_arn
+  source_code_hash = data.archive_file.auth_lambda.output_base64sha256
+}
+
+
 resource "aws_security_group" "lambda_sg" {
   name        = "lambda-security-group"
   description = "Security group for Lambda functions connecting to Aurora"
