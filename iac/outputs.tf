@@ -8,6 +8,10 @@ output "cognito_hosted_ui_url" {
   sensitive = true
 }
 
+output "login_client_id" {
+     value = "${aws_cognito_user_pool_client.product_users.id}" 
+}
+
 output "website_url" {
     value = "${aws_apigatewayv2_api.product_api.api_endpoint}/front"
 }
