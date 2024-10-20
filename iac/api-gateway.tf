@@ -64,12 +64,12 @@ output "lambda_function_keys" {
 
 locals {
   lambda_permission_map = {
-    "addProduct"                      = { requires_admin = true, requires_auth = true }
-    "addProductImage"                 = { requires_admin = true, requires_auth = true }
+    "addProduct"                      = { requires_admin = false/*TODO set to true*/, requires_auth = true }
+    "addProductImage"                 = { requires_admin = false/*TODO set to true*/, requires_auth = true }
     "bookProduct"                     = { requires_admin = false, requires_auth = true }
-    "deleteProduct"                   = { requires_admin = true, requires_auth = true }
-    "getAllProducts"                  = { requires_admin = false, requires_auth = true }
-    "getBookings"                     = { requires_admin = true, requires_auth = true }
+    "deleteProduct"                   = { requires_admin = false/*TODO set to true*/, requires_auth = true }
+    "getAllProducts"                  = { requires_admin = false, requires_auth = false }
+    "getBookings"                     = { requires_admin = false,/*TODO set to true*/ requires_auth = true }
     "redirectLambda"                  = { requires_admin = false, requires_auth = false } 
     }
 }

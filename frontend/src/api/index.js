@@ -21,15 +21,12 @@ axiosInstance.interceptors.request.use((config) => {
 
 
 class ApiClient {
-  constructor(baseUrl) {
-    this.baseUrl = baseUrl;
-  }
 
-  async request(method, path, body) {
+  static async request(method, path, body) {
     try {
       const response = await axiosInstance({
         method,
-        url: `${this.baseUrl}${path}`,
+        url: `${path}`,
         headers: {
           "Content-Type": "application/json",
         },
@@ -42,21 +39,26 @@ class ApiClient {
     }
   }
 
-  async getItemList() {
-    return await this.request("GET", "/items");
+  static async getProducts() {
+    return await this.request("GET", "/products");
   }
 
-  async getItem(id) {
-    return await this.request("GET", `/items/${id}`);
+  static async getBookings() {
+    return await this.request("GET", "/bookings");
   }
 
-  async modifyItem(id, data) {
-    return await this.request("PUT", `/items/${id}`, data);
+  static async addProduct(data) {
+    return await this.request("POST", `/products`, data);
   }
 
-  async login(username, password) {
-    return await this.request("POST", "/login", { username, password });
+  static async bookProduct(id, data) {
+    return await this.request("POST", `/products/${id}`, data);
   }
+
+  static async deleteProduct(id) {
+    return await this.request("DELETE", `/products/${id}`);
+  }
+
 }
 
 export default ApiClient;
