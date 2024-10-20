@@ -13,21 +13,13 @@ exports.handler = async (event) => {
 
     await client.connect();
 
-    if (overwrite) {
-        const query = `
-        DO $$
-        BEGIN
-            DROP TABLE product;
-            DROP TABLE reservation;
-            DROP TABLE users
-        END $$; `
-        await client.query(query);
-    }
-
     const query = `
         DO $$
         BEGIN
-            CREATE TABLE IF NOT EXISTS product(
+            DROP TABLE IF EXISTS product;
+            DROP TABLE IF EXISTS reservation;
+            DROP TABLE IF EXISTS users;
+            CREATE TABLE product(
                 id serial PRIMARY KEY,
                 name varchar(256) UNIQUE NOT NULL,
                 price numeric(10,2)  NOT NULL,
@@ -36,7 +28,7 @@ exports.handler = async (event) => {
                 image_url varchar(256)
             );
             
-             CREATE TABLE IF NOT EXISTS  users(
+             CREATE TABLE users(
                 id serial PRIMARY KEY,
                 username varchar(256) UNIQUE  NOT NULL,
                 role int  NOT NULL, 
@@ -44,7 +36,7 @@ exports.handler = async (event) => {
                 verified boolean  NOT NULL
             );
 
-            CREATE TABLE IF NOT EXISTS  reservation(
+            CREATE TABLE reservation(
                 id serial PRIMARY KEY,
                 user_id int  NOT NULL,
                 product_id int  NOT NULL,
@@ -63,8 +55,8 @@ exports.handler = async (event) => {
             -- Insert two products into the 'product' table
             INSERT INTO product (name, price, stock, description, image_url)
             VALUES 
-                ('Product 1', 29.99, 100, 'Description for Product 1', 'http://example.com/product1.jpg'),
-                ('Product 2', 49.99, 50, 'Description for Product 2', 'http://example.com/product2.jpg')
+                ('Product 1', 29.99, 100, 'Description for Product 1', 'https://img.freepik.com/free-photo/organic-cosmetic-product-with-dreamy-aesthetic-fresh-background_23-2151382816.jpg?semt=ais_hybrid'),
+                ('Product 2', 49.99, 50, 'Description for Product 2', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D')
             ON CONFLICT (name) DO NOTHING;
         END $$;
     `;

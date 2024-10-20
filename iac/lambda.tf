@@ -36,7 +36,7 @@ resource "aws_lambda_function" "api_action" {
 
   role = local.lab_role_arn // usamos LabRole porque no podemos crear roles o adjuntar policies
 
-  timeout = 15
+  timeout = 30
 
   environment {
     variables = {
@@ -78,6 +78,13 @@ resource "aws_security_group" "lambda_sg" {
   egress {
     from_port   = 5432
     to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+    egress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
