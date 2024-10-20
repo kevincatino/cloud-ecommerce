@@ -26,12 +26,6 @@ variable "db_user" {
   type        = string
 }
 
-variable "db_pass" {
-  description = "Password for DB"
-  type        = string
-  sensitive   = true
-}
-
 variable "google_auth_client_id" {
   description = "Client id of Google project that provides auth"
   type        = string

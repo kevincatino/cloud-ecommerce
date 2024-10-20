@@ -12,7 +12,7 @@ resource "aws_lambda_function" "schema_action" {
       DB_PORT     = "5432"
       DB_NAME     = var.db_name
       DB_USER     = var.db_user
-      DB_PASSWORD = var.db_pass
+      DB_PASSWORD = random_password.db_password.result
     }
   }
 
@@ -44,7 +44,7 @@ resource "aws_lambda_function" "api_action" {
       DB_PORT     = "5432"
       DB_NAME     = var.db_name
       DB_USER     = var.db_user
-      DB_PASSWORD = var.db_pass
+      DB_PASSWORD = random_password.db_password.result
       IMAGES_BUCKET = aws_s3_bucket.item_images.id
       WEBSITE_URL = module.web_app_1.website_url
     }

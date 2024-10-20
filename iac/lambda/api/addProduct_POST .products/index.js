@@ -25,6 +25,12 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: "Fields productName, productPrice y productStockAmount are mandatory" }),
         };
     }
+    if ( productName = "" || productPrice <= 0 || productStockAmount <= 0 ){
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Invalid body values" }),
+        };
+    }
     
     await client.connect();
 

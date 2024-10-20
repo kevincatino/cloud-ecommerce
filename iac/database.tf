@@ -1,3 +1,9 @@
+resource "random_password" "db_password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
 resource "aws_security_group" "aurora_sg" {
   vpc_id = module.vpc.vpc_id
 
@@ -39,7 +45,7 @@ resource "aws_rds_cluster" "aurora" {
   engine_mode            = "serverless"
   cluster_identifier     = "aurora-cluster"
   master_username        = var.db_user
-  master_password        = var.db_pass
+  master_password        = random_password.db_password.result
   database_name          = var.db_name
   enable_http_endpoint   = true
   skip_final_snapshot    = true

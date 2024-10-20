@@ -35,8 +35,38 @@ exports.handler = async (event) => {
         };
     }
 
+    if ( amount <= 0 ){
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Invalid body values" }),
+        };
+    }
+
     await client.connect();
 
+    try {
+        const query = `SELECT stock FROM product where id = $1`;
+        const result = await client.query(query,[id]);
+        if (result.rowCount === 0) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ message: "Product not found" }),
+            };
+        }
+        stock = result.rows[0].stock;
+        if (stock < amount){
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Amount to book is greater than stock" }),
+            };
+        }
+    } catch(error) {
+        await client.end();
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: "Error booking product", error: error.message }),
+        };
+    }
     try {
         const query = `UPDATE product SET stock = stock - $2 WHERE id = $1`;
         const result = await client.query(query, [id, amount]);
