@@ -12,6 +12,12 @@ export default function App({ Component, pageProps }) {
   const [token, setToken] = useState(null);
   const router = useRouter();
 
+  const logoutFun = () => {
+    setToken(null)
+    setIsLoggedIn(false)
+    localStorage.setItem('jwtToken', null)
+  }
+
   useEffect(() => {
     // Function to fetch the JWT token using the code from query parameters
     const fetchToken = async (code) => {
@@ -59,9 +65,8 @@ export default function App({ Component, pageProps }) {
 }, [router.isReady, router.query]);
 
   return <div className='w-full bg-primary min-h-screen flex flex-col'>
-    <Navbar/>
+    <Navbar isLogged={isLoggedIn} logoutFun={logoutFun}/>
     <main className='w-full flex-1 flex'>
-      {"Logged In: " + isLoggedIn}
     <Component {...pageProps} />
     </main>
   </div>
