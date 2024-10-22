@@ -90,7 +90,7 @@ resource "aws_cognito_user_pool_client" "product_users" {
   allowed_oauth_scopes      = ["email", "openid"]
   allowed_oauth_flows_user_pool_client = true
 
-  callback_urls = ["${aws_apigatewayv2_api.product_api.api_endpoint}/front"]
+  callback_urls = ["${module.product_api_gateway.api_gateway_url}/front"]
 
   supported_identity_providers = ["COGNITO", "Google"]
   depends_on = [aws_cognito_identity_provider.google]
