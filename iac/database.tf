@@ -77,12 +77,17 @@ resource "aws_rds_cluster" "aurora" {
   }
 }
 
-resource "aws_lambda_invocation" "invoke_generate_schema" {
-  function_name = aws_lambda_function.schema_action.function_name
 
-  input = jsonencode({
-    "action" : "generate_schema"
-  })
+resource "null_resource" "invoke_lambda_generate_schema" {
+  provisioner "local-exec" {
+    command = "aws lambda invoke --function-name ${aws_lambda_function.schema_action.function_name} --region us-east-1 NUL"
+  }
 
-  depends_on = [aws_lambda_function.schema_action]
+  depends_on = [
+    aws_rds_cluster.aurora
+  ]
+
+  triggers = {
+    rds_cluster_id = aws_rds_cluster.aurora.id
+  }
 }
