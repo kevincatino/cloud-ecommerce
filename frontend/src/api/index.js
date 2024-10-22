@@ -22,14 +22,12 @@ axiosInstance.interceptors.request.use((config) => {
 
 class ApiClient {
 
-  static async request(method, path, body) {
+  static async request(method, path, body, headers) {
     try {
       const response = await axiosInstance({
         method,
         url: `${path}`,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers ? headers : {"Content-Type": "application/json"},
         data: body,
       });
       return { error: false, data: response.data };
@@ -57,6 +55,10 @@ class ApiClient {
 
   static async deleteProduct(id) {
     return await this.request("DELETE", `/products/${id}`);
+  }
+
+  static async addImage(id, data) {
+    return await this.request("PUT", `/products/${id}/image`, data,  {"Content-Type": "multipart/form-data"});
   }
 
 }

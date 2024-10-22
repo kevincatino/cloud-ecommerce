@@ -35,10 +35,15 @@ exports.handler = async (event) => {
     await client.connect();
 
     try{
-        const query = `INSERT INTO product (name,price,stock,description) VALUES($1,$2,$3,$4)`
+        const query = `INSERT INTO product (name,price,stock,description) VALUES($1,$2,$3,$4) RETURNING id`
         const values = [productName,productPrice,productStockAmount,productDescription]
-        await client.query(query,values);
+        const result = await client.query(query,values);
         await client.end();
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Succesfull product adding", id: result.rows[0].id }),
+        };
     }catch(error){
         await client.end();
         return {
@@ -46,9 +51,4 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: "Error adding product.", error: error.message }),
         };
     }
-    
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Succesfull product adding" }),
-    };
 };

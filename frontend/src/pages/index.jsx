@@ -25,13 +25,14 @@ export default function Home() {
     id: ""
   });
   const [deleteResponse, setDeleteResponse] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleAdd = async () => {
     try {
       const response = await ApiClient.addProduct(addItem)
       const data = response.data
       setAddResponse(data);
-      console.log('Added item:', data);
+      await addImage(data.id)
       setAddItem({
         productName: "", 
         productPrice: "",
@@ -96,6 +97,17 @@ export default function Home() {
     }
   };
 
+  const addImage = async (id) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+      await ApiClient.addImage(id,formData);
+      setSelectedImage(null)
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -115,6 +127,8 @@ export default function Home() {
           inputValue={addItem}
           setInputValue={setAddItem}
           addResponse={addResponse}
+          hasInputImage={true}
+          setSelectedImage={setSelectedImage}
         />
         <ActionButton 
           buttonText="Get products" 
