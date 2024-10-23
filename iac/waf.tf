@@ -42,8 +42,7 @@
 #   }
 # }
 
-# # Associate the WAF Web ACL with the API Gateway
-# resource "aws_wafv2_web_acl_association" "api_gateway_acl_association" {
-#   resource_arn = aws_apigatewayv2_api.product_api.arn
+# resource "aws_wafv2_web_acl_association" "api-waf" {
+#   resource_arn = aws_apigatewayv2_stage.default.arn
 #   web_acl_arn  = aws_wafv2_web_acl.api_gateway_acl.arn
 # }
