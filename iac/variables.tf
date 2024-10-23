@@ -61,12 +61,3 @@ variable "private_subnets" {
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]
 }
-
-variable "default_tags" {
-  description = "Default tags to apply to all resources"
-  type        = map(string)
-  default = {
-    Project = "cloud-pickup-ecommerce"
-    Owner   = "kcatino, acaeiro, cditoro, iszejer"
-  }
-} // TODO: maybe we could use locals instead of variables for this

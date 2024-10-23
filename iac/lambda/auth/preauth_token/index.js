@@ -1,5 +1,5 @@
 exports.handler = async (event, context) => {
-		let newScopes = event.request.groupConfiguration.groupsToOverride.map(item => `${item}-${event.callerContext.clientId}`)
+		let newScopes = event.request.groupConfiguration.groupsToOverride.map(item => `${item}-${event.callerContext.clientId} ${item}`)
 	event.response = {
 		"claimsOverrideDetails": {
 			"claimsToAddOrOverride": {
