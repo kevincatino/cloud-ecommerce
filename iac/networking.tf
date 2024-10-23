@@ -12,9 +12,9 @@ module "vpc" {
   enable_nat_gateway = false
   enable_vpn_gateway = false
 
-  tags = merge(var.default_tags, {
+  tags = {
     Name = var.vpc_name
-  })
+  }
 }
 
 # Subnet Group for Aurora
