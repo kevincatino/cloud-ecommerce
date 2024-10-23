@@ -35,8 +35,8 @@ exports.handler = async (event) => {
     await client.connect();
 
     try{
-        const query = `INSERT INTO product (name,price,stock,description) VALUES($1,$2,$3,$4) RETURNING id`
-        const values = [productName,productPrice,productStockAmount,productDescription]
+        const query = `INSERT INTO product (name,price,stock,description, image_url) VALUES($1,$2,$3,$4,$5) RETURNING id`
+        const values = [productName,productPrice,productStockAmount,productDescription, "https://pbs.twimg.com/profile_images/1475829463766249473/rltJ5_u3_400x400.jpg"]
         const result = await client.query(query,values);
         await client.end();
 
