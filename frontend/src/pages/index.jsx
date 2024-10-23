@@ -51,9 +51,8 @@ export default function Home({isLogged}) {
       setAddBookingResponse(data);
       console.log('Added item:', data);
       setAddBooking({
-        userId: "", 
-        amount: "",
         productId: "",
+        amount: "",
       })
     } catch (error) {
       console.error('Error adding item:', error)
