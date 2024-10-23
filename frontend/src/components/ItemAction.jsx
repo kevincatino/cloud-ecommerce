@@ -15,7 +15,8 @@ const ActionButton = ({
   deleteResponse,
   isGetBooking,
   hasInputImage,
-  setSelectedImage
+  setSelectedImage,
+  isLogged
 }) => {
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -44,10 +45,13 @@ const ActionButton = ({
       } ${hasBorderLeft ? "border-l-2 border-white" : ""}`}
       style={{ width: "33.33vw", height: "100%" }}
     >
+      {console.log(isLogged)}
       <button
-        className={`text-white font-bold py-2 px-4 rounded mt-4`}
+        className={`font-bold py-2 px-4 rounded mt-4 ${!isLogged ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'text-white'}`}
         onClick={onButtonClick}
-        style={{ backgroundColor: buttonColor }}
+        style={{ backgroundColor: isLogged ? buttonColor : 'gray' }}
+        disabled={!isLogged}
+        title={!isLogged ? 'You must log in to perfom this action' : ''}
       >
         {buttonText}
       </button>
@@ -65,6 +69,17 @@ const ActionButton = ({
             onChange={(e) => handleInputChange(e, k)}
           />
         ))}
+        {hasInputImage && (
+            <div className="mt-4 ml-6 mr-6">
+                <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setSelectedImage(e.target.files[0])}
+                className="px-3 py-2 border border-gray-300 rounded-lg max-w-md w-full"
+                />
+            </div>
+        )}
+
       {addResponse && (
         <div className="mt-4 p-4 bg-gray-800 text-white border border-gray-600 rounded-lg w-11/12">
           <p className="text-lg font-semibold mb-2">Response:</p>
@@ -122,18 +137,6 @@ const ActionButton = ({
           <p>ID: {deleteResponse.id}</p>
         </div>
       )}
-
-      {hasInputImage && (
-        <div className="mt-4">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setSelectedImage(e.target.files[0])}
-          className="mt-4 px-3 py-2 border border-gray-300 rounded-lg"
-        />
-        </div>
-      )
-      }
     </div>
   );
 };

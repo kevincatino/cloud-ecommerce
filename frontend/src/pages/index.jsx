@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import ApiClient from 'src/api';
 
-export default function Home() {
+export default function Home({isLogged}) {
 
   const [addItem, setAddItem] = useState({
     productName: "", 
@@ -129,6 +129,7 @@ export default function Home() {
           addResponse={addResponse}
           hasInputImage={true}
           setSelectedImage={setSelectedImage}
+          isLogged={isLogged}
         />
         <ActionButton 
           buttonText="Get products" 
@@ -138,6 +139,7 @@ export default function Home() {
           hasBorderLeft={true}
           hasBorderRight={true}
           getResponse={getItems}
+          isLogged={true}
         />
         <ActionButton 
           buttonText="Delete product" 
@@ -148,6 +150,7 @@ export default function Home() {
           inputValue={deleteItemId}
           setInputValue={setDeleteItemId}
           deleteResponse={deleteResponse}
+          isLogged={isLogged}
         />
 
         <ActionButton 
@@ -161,6 +164,7 @@ export default function Home() {
           inputValue={addBooking}
           setInputValue={setAddBooking}
           addResponse={addBookingResponse}
+          isLogged={isLogged}
         />
 
         <ActionButton 
@@ -171,6 +175,7 @@ export default function Home() {
           hasBorderRight={true}
           getResponse={getItemsBooked}
           isGetBooking={true}
+          isLogged={isLogged}
         />
       </div>
     </>
