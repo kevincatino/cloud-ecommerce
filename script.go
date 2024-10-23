@@ -193,6 +193,10 @@ func main() {
 			log.Fatalf("Error: %v", err)
 		}
 
+		if err := runTerraformCommand([]string{"init"}); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
 		if err := runTerraformCommand([]string{"apply", "-auto-approve"}); err != nil {
 			log.Fatalf("Error: %v", err)
 		}

@@ -50,7 +50,7 @@ class ApiClient {
   }
 
   static async bookProduct(id, data) {
-    return await this.request("POST", `/products/${id}`, data);
+    return await this.request("POST", `/products/${id}/bookings`, data);
   }
 
   static async deleteProduct(id) {

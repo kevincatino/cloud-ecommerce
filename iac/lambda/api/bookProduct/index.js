@@ -1,4 +1,5 @@
 const { Client } = require('pg');
+const { jwtDecode } = require('jwt-decode')
 
 exports.handler = async (event) => {
     const client = new Client({
@@ -26,7 +27,30 @@ exports.handler = async (event) => {
     }
     const body = JSON.parse(event.body);
 
-    const { userId, amount } = body;
+    const userId = event.requestContext.accountId
+
+    await client.connect();
+
+    try {
+        const query = `SELECT * FROM users where id = $1`;
+        const result = await client.query(query,[userId]);
+        const decoded = jwtDecode(event.headers.authorization.split(' ')[1])
+        const email = decoded.email
+        const email_verified = decoded.email_verified
+        if (result.rowCount === 0) {
+            const insertUserQuery = `INSERT INTO users (id, email, role, verified) VALUES($1,$2,$3,$4)`
+            const values = [userId,email, 0, email_verified]
+            await client.query(insertUserQuery,values)
+        }
+    } catch(error) {
+        await client.end();
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: "Error adding new user", error: error.message }),
+        };
+    }
+
+    const { amount } = body;
 
     if (!userId || !amount){
         return {
@@ -41,8 +65,6 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: "Invalid body values" }),
         };
     }
-
-    await client.connect();
 
     try {
         const query = `SELECT stock FROM product where id = $1`;

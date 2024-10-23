@@ -16,12 +16,12 @@ exports.handler = async (event) => {
     const query = `
         DO $$
         BEGIN
-            DROP TABLE IF EXISTS product;
-            DROP TABLE IF EXISTS reservation;
-            DROP TABLE IF EXISTS users;
+            DROP TABLE IF EXISTS product CASCADE;
+            DROP TABLE IF EXISTS reservation CASCADE;
+            DROP TABLE IF EXISTS users CASCADE;
             CREATE TABLE product(
                 id serial PRIMARY KEY,
-                name varchar(256) UNIQUE NOT NULL,
+                name varchar(256) NOT NULL,
                 price numeric(10,2)  NOT NULL,
                 stock int  NOT NULL CHECK (stock > 0),
                 description varchar(1000)  NOT NULL,
@@ -29,16 +29,16 @@ exports.handler = async (event) => {
             );
             
              CREATE TABLE users(
-                id serial PRIMARY KEY,
-                username varchar(256) UNIQUE  NOT NULL,
+                id varchar(256) PRIMARY KEY,
+                username varchar(256) UNIQUE,
                 role int  NOT NULL, 
-                email varchar(256)  NOT NULL,
+                email varchar(256)  UNIQUE NOT NULL,
                 verified boolean  NOT NULL
             );
 
             CREATE TABLE reservation(
                 id serial PRIMARY KEY,
-                user_id int  NOT NULL,
+                user_id varchar(256)  NOT NULL,
                 product_id int  NOT NULL,
                 quantity int NOT NULL,
                 reservation_date timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -48,16 +48,15 @@ exports.handler = async (event) => {
             );
 
             -- Insert a user into the 'users' table
-            INSERT INTO users (username, role, email, verified)
-            VALUES ('john_doe', 1, 'john.doe@example.com', true)
+            INSERT INTO users (id, username, role, email, verified)
+            VALUES (1, 'john_doe', 1, 'john.doe@example.com', true)
             ON CONFLICT (username) DO NOTHING;
 
             -- Insert two products into the 'product' table
             INSERT INTO product (name, price, stock, description, image_url)
             VALUES 
                 ('Product 1', 29.99, 100, 'Description for Product 1', 'https://img.freepik.com/free-photo/organic-cosmetic-product-with-dreamy-aesthetic-fresh-background_23-2151382816.jpg?semt=ais_hybrid'),
-                ('Product 2', 49.99, 50, 'Description for Product 2', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D')
-            ON CONFLICT (name) DO NOTHING;
+                ('Product 2', 49.99, 50, 'Description for Product 2', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D');
         END $$;
     `;
 
